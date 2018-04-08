@@ -10,7 +10,6 @@ import com.rong360.model.DeleteQueueData;
 import com.rong360.model.InsertQueueData;
 import com.rong360.model.QueueData;
 import com.rong360.model.UpdateQueueData;
-import com.rong360.rabbitmq.RabbitAPI;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
