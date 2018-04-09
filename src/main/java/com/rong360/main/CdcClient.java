@@ -59,13 +59,12 @@ public class CdcClient {
 	}
 
 	public void start() {
-
 		try {
-			String baseLogHome = System.getProperty("CDC_LOG_BASE_HOME");
+			String baseLogHome = System.getProperty("cdc.log.base.home");
 			if (StringUtils.isEmptyOrWhitespaceOnly(baseLogHome)){
 				System.setProperty("LOG_HOME", logBaseHome + instance);
 			}else{
-				System.setProperty("LOG_HOME", baseLogHome + instance);
+				System.setProperty("LOG_HOME", baseLogHome + "/" + instance);
 			}
 			final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
 			ctx.reconfigure();
