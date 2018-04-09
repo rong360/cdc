@@ -1,4 +1,7 @@
+# java clss files
 /target/
+
+# eclipse ide files
 .classpath
 .project
 .settings/
