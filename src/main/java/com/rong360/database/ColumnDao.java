@@ -43,16 +43,12 @@ public class ColumnDao {
 			return result;
 		}
 		result = new HashMap<Integer, String>();
-		String sql = "select column_name,ordinal_position from INFORMATION_SCHEMA.COLUMNS "
-				+ "where table_schema = ? and table_name = ?";
-
+		String sql = "select column_name,ordinal_position from INFORMATION_SCHEMA.COLUMNS where table_schema = ? and table_name = ?";
 		Connection connection = null;
-
 		try {
 			Class.forName("com.mysql.jdbc.Driver");
 			String url = "jdbc:mysql://%s:%s/INFORMATION_SCHEMA?user=%s&password=%s&useUnicode=true&characterEncoding=UTF8";
-			url = String.format(url, GlobalConfig.mysql_host, GlobalConfig.mysql_port, GlobalConfig.mysql_username,
-					GlobalConfig.mysql_password);
+			url = String.format(url, GlobalConfig.mysql_host, GlobalConfig.mysql_port, GlobalConfig.mysql_username,GlobalConfig.mysql_password);
 			connection = DriverManager.getConnection(url);
 			ps = connection.prepareStatement(sql);
 			ps.setString(1, dbName);

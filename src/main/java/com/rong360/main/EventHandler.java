@@ -204,17 +204,8 @@ public class EventHandler extends Thread{
 				log.warn(e.getMessage());
 			}
 		}
-		shutdownpoll();
 	}
 	
-	private static void shutdownpoll(){
-		try {
-			sleep(4);
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }
 
 

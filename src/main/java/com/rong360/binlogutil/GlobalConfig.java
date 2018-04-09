@@ -48,6 +48,8 @@ public class GlobalConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(GlobalConfig.class);
     private final static ReadWriteLock lock = new ReentrantReadWriteLock();//lock
+    private final static Integer FILTER_TYPE_PER =1;
+    private final static Integer FILTER_TYPE_SEQ =2;
 
     public static boolean filterByTableId(long tableId) {
 
@@ -77,14 +79,14 @@ public class GlobalConfig {
             }
             for (String s : suffixMap.keySet()) {
                 if (fullName.indexOf(s) == 0) {
-                    if (suffixMap.get(s) == 2) {
-                        filterMap.put(fullName, 2);
+                    if (suffixMap.get(s) == FILTER_TYPE_SEQ) {
+                        filterMap.put(fullName, FILTER_TYPE_SEQ);
                         logger.info(fullName + " match:" + s + "{suffix},stored into seq priority configuration");
-                        return 2;
-                    } else if (suffixMap.get(s) == 1) {
-                        filterMap.put(fullName, 1);
+                        return FILTER_TYPE_SEQ;
+                    } else if (suffixMap.get(s) == FILTER_TYPE_PER) {
+                        filterMap.put(fullName, FILTER_TYPE_PER);
                         logger.info(fullName + " match:" + s + "{suffix},stored into performance priority configuration");
-                        return 1;
+                        return FILTER_TYPE_PER;
                     }
                 }
             }
@@ -110,9 +112,9 @@ public class GlobalConfig {
         StringBuffer sx = new StringBuffer();
         for (String s : tmpFilterMap.keySet()) {
             print = true;
-            if (tmpFilterMap.get(s) == 1) {
+            if (tmpFilterMap.get(s) == FILTER_TYPE_PER) {
                 xn.append(s + (prefix?"{suffix}":"")+"\n");
-            } else if (tmpFilterMap.get(s) == 2) {
+            } else if (tmpFilterMap.get(s) == FILTER_TYPE_SEQ) {
                 sx.append(s + (prefix?"{suffix}":"")+"\n");
             }
         }
@@ -185,8 +187,8 @@ public class GlobalConfig {
         String appConfig = RongUtil.etcdPrefix() + "config/app";
         List<KeyValue> list = EtcdClient.getInstance().getKVClient().get(ByteSequence.fromString(appConfig),
                 GetOption.newBuilder().withPrefix(ByteSequence.fromString(appConfig)).build()).get().getKvs();
-        Class c = Class.forName("com.rong360.binlogutil.GlobalConfig");
-        Constructor con = c.getConstructor();
+        Class<?> c = Class.forName("com.rong360.binlogutil.GlobalConfig");
+        Constructor<?> con = c.getConstructor();
         Object obj = con.newInstance();
         for (KeyValue keyValue : list) {
             String[] tmpKey = keyValue.getKey().toStringUtf8().split("/");
