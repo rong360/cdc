@@ -79,11 +79,11 @@ public class GlobalConfig {
                 if (fullName.indexOf(s) == 0) {
                     if (suffixMap.get(s) == 2) {
                         filterMap.put(fullName, 2);
-                        logger.info(fullName + "match:" + s + "{suffix},stored into seq priority configuration");
+                        logger.info(fullName + " match:" + s + "{suffix},stored into seq priority configuration");
                         return 2;
                     } else if (suffixMap.get(s) == 1) {
                         filterMap.put(fullName, 1);
-                        logger.info(fullName + "match:" + s + "{suffix},stored into performance priority configuration");
+                        logger.info(fullName + " match:" + s + "{suffix},stored into performance priority configuration");
                         return 1;
                     }
                 }
