@@ -48,7 +48,7 @@ public class RongTimer implements Runnable{
 				EventHandler.dumpBinlogPos();
 				if (!setLockInf){
                     //Identify who takes the lock
-                    EtcdApi.registerByLeaseId(RongUtil.getRegisterKey(), "2", CdcClient.registerLeaseId);
+                    EtcdApi.registerByLeaseId(RongUtil.getRegisterKey(), Constant.REGISTER_STATUS_RUN, CdcClient.registerLeaseId);
                     setLockInf = true;
                 }
 				for(int i=0; i< workerNum + 1;i++){

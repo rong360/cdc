@@ -23,6 +23,8 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static com.rong360.main.Constant.REGISTER_STATUS_OK;
+
 /**
  * 
  * @author zhangtao@rong360.com
@@ -52,10 +54,10 @@ public class CdcClient {
 		CdcClient.logBaseHome = logBaseHome;
 	}
 
-	public CdcClient(String etcdHost, String etcdUsername, String ectdPassword) {
+	public CdcClient(String etcdHost, String etcdUsername, String etcdPassword) {
 		GlobalConfig.etcd_host = etcdHost.trim().split(",");
 		GlobalConfig.etcd_username = etcdUsername.trim();
-		GlobalConfig.etcd_password = ectdPassword.trim();
+		GlobalConfig.etcd_password = etcdPassword.trim();
 	}
 
 	public void start() {
@@ -81,7 +83,7 @@ public class CdcClient {
 			String name = ManagementFactory.getRuntimeMXBean().getName();
 			pid = name.split("@")[0];
 
-			registerLeaseId = EtcdApi.register(RongUtil.getRegisterKey(), "1");
+			registerLeaseId = EtcdApi.register(RongUtil.getRegisterKey(), Constant.REGISTER_STATUS_OK);
 			new Thread(new GuardEtcd(registerLeaseId)).start();
 
             EtcdApi.getLock(registerLeaseId);
