@@ -7,18 +7,18 @@ while getopts "c:hi:j:l:" opt
 do
     case $opt in
         c)master=$OPTARG;;
-		i)instance=$OPTARG;;
-		l)logBaseHome=$OPTARG;;
-		j)javaPath=$OPTARG;;
-		?)
-		echo "OPTIONS:"
-		echo "	-i specify instance e.g. -i instance_a,instance_b "
-		echo "	-c specify cluster default master (not required) e.g. -c beijing"
-		echo "	-j specify java bin, if you do not configure the java environment variable needs to be specified -j /usr/bin/java"
-		echo "	-l log4j base home e.g. -l /home/log/"
-		echo "example: "
-		echo "	sh start.sh -i instance_a,instance_b"
-		exit 1;;
+        i)instance=$OPTARG;;
+        l)logBaseHome=$OPTARG;;
+        j)javaPath=$OPTARG;;
+        ?)
+        echo "OPTIONS:"
+        echo "	-i specify instance e.g. -i instance_a,instance_b "
+        echo "	-c specify cluster default master (not required) e.g. -c beijing"
+        echo "	-j specify java bin, if you do not configure the java environment variable needs to be specified -j /usr/bin/java"
+        echo "	-l log4j base home e.g. -l /home/log/"
+        echo "example: "
+        echo "	sh start.sh -i instance_a,instance_b"
+        exit 1;;
     esac
 done
 
