@@ -51,11 +51,11 @@ for file in ${DIRS[@]}
 			echo "starting "$master" cluster's instance:"$file
 			nohup $javaBin -Xms1024m -Xmx1024m -Xmn512m -Djava.awt.headless=true $JAVA_OPTS com.rong360.main.Rong360CDC $file $master>/dev/null 2>&1 &
 			#check start status
-			sleep 1
+			sleep 5
 			pid=`ps aux | grep com.rong360.main.Rong360CDC |grep "$file" |grep "$master"| grep -v grep | awk  '{print $2}'`
 			if [ -z $pid ];then
 				echo "start fail!"$master" cluster's instance:"$file
-				echo "please check java env or Xms setting is greater than memory:"$javaPath
+				echo "please check java env or etcd config:"$javaPath
 			else
 				echo "start success!"$master" cluster's instance:"$file" [pid:"$pid"]"
 			fi

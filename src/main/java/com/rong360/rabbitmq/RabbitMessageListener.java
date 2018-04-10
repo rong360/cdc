@@ -21,8 +21,8 @@ import java.util.concurrent.TimeoutException;
  * @author zhangtao@rong360.com
  *
  */
-public class RabbitAPI implements CdcClient.MessageListener{
-	private final static Logger logger = LoggerFactory.getLogger(RabbitAPI.class);
+public class RabbitMessageListener implements CdcClient.MessageListener{
+	private final static Logger logger = LoggerFactory.getLogger(RabbitMessageListener.class);
 	private volatile static Connection connection = null;
 	private volatile static Channel channel = null;
 
@@ -55,7 +55,7 @@ public class RabbitAPI implements CdcClient.MessageListener{
 	public static Channel getChannel(){
 		if (channel == null){
 			try {
-				synchronized (RabbitAPI.class) {
+				synchronized (RabbitMessageListener.class) {
 					if (channel == null) {
 						channel = getConnection().createChannel();
 					}
@@ -81,13 +81,13 @@ public class RabbitAPI implements CdcClient.MessageListener{
 			logger.warn("publishBatch IOException:" + e.getMessage());
 			isSuc = false;
 			try {
-				RabbitAPI.channel.close();
-				RabbitAPI.connection.close();
+				RabbitMessageListener.channel.close();
+				RabbitMessageListener.connection.close();
 			} catch (Exception ec) {
 				ec.printStackTrace();
 			}
-			RabbitAPI.connection = null;
-			RabbitAPI.channel = null;
+			RabbitMessageListener.connection = null;
+			RabbitMessageListener.channel = null;
 		}
 		return isSuc;
 	}

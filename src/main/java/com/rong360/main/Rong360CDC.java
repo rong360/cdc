@@ -2,7 +2,7 @@ package com.rong360.main;
 
 import com.google.common.io.Resources;
 import com.mysql.jdbc.StringUtils;
-import com.rong360.rabbitmq.RabbitAPI;
+import com.rong360.rabbitmq.RabbitMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,7 +47,7 @@ public class Rong360CDC {
             CdcClient client = new CdcClient(etcdHost, etcdUsername, etcdPassword);
             client.setCluster(cluster);
             client.setInstance(instance);
-            client.registerMessageListener(new RabbitAPI());
+            client.registerMessageListener(new RabbitMessageListener());
             client.start();
         } catch (Exception e) {
             e.printStackTrace();
