@@ -5,6 +5,7 @@ import com.coreos.jetcd.data.KeyValue;
 import com.coreos.jetcd.options.GetOption;
 import com.mysql.jdbc.StringUtils;
 import com.rong360.etcd.EtcdClient;
+import com.rong360.main.Constant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,13 +160,13 @@ public class GlobalConfig {
                         mysqlTimeZone = tmpVal;
                         break;
                     case "filter" :
-                        if (tmpVal.equals("1")){
+                        if (tmpVal.equals(Constant.FILTER_TABLE_ONLINE)){
                             isNeedperThread = true;
                             generateMap(tmpKey[6], tmpKey[7], 1);
                         }
                         break;
                     case "seqfilter" :
-                        if (tmpVal.equals("1")){
+                        if (tmpVal.equals(Constant.FILTER_TABLE_ONLINE)){
                             isNeedseqThread = true;
                             generateMap(tmpKey[6], tmpKey[7], 2);
                         }

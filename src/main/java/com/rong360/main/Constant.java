@@ -10,5 +10,6 @@ public class Constant {
     public static final String REGISTER_STATUS_OK   = "1";
     //Registration successful and get lock running
     public static final String REGISTER_STATUS_RUN  = "2";
-
+    //filter online table identification
+    public static final String FILTER_TABLE_ONLINE  = "1";
 }

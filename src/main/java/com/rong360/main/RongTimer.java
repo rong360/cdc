@@ -58,7 +58,7 @@ public class RongTimer implements Runnable{
 						needRevoke =true;
 					}
 					if(i == workerNum && !threadArr[i].isAlive() && GlobalConfig.isNeedseqThread){
-						threadArr[i] = new EventHandler("seq priority queue-",client,2);
+						threadArr[i] = new EventHandler("seq priority queue",client,2);
 						needRevoke = true;
 					}
 					if(needRevoke){
