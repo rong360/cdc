@@ -22,12 +22,12 @@ public class Rong360CDC {
 
         try {
             if(args.length < 1){
-                logger.error("invald params");
+                logger.error("invalid params");
                 return;
             }
             String instance = args[0];
             if (StringUtils.isEmptyOrWhitespaceOnly(instance)){
-                logger.error("invald instance");
+                logger.error("invalid instance");
                 return;
             }
             String cluster = "master";
