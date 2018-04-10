@@ -122,7 +122,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.rong360.main.Cdc</mainClass>
+                            <mainClass>com.rong360.main.Rong360CDC</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
