@@ -174,7 +174,8 @@ public class GlobalConfig {
                 }
             }
             if (filterMap.size() == 0 && suffixMap.size() == 0) {
-                throw new Exception("filter or seqfilter config is empty!");
+                logger.error("filter or seqfilter config is empty!");
+                System.exit(1);
             }
             logTableInfo(false);
             logTableInfo(true);
