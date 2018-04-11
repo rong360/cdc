@@ -33,8 +33,8 @@ public class GlobalConfig {
     public static String rabbitmq_password = null;
     public static String rabbitmq_exchangename = null;
 
-    public static Integer ping_failed_maxretry = null;
-    public static Integer connect_timedout = null;
+    public static Integer ping_failed_maxretry = 50;
+    public static Integer connect_timedout = 10;
     public static String mysqlTimeZone = "GMT+8";
 
     public static boolean isNeedperThread = false;
@@ -199,6 +199,13 @@ public class GlobalConfig {
                 f.set(obj, Integer.parseInt(tmpVal));
             } else {
                 f.set(obj, tmpVal);
+            }
+        }
+        Field[] allConfigField = c.getFields();
+        for (Field configF : allConfigField) {
+            if (configF.get(obj) == null) {
+                logger.error("{} is not config in etcd", configF.getName());
+                throw new Exception("no config in etcd");
             }
         }
         loadCdcConf();
