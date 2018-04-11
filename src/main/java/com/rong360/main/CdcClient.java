@@ -89,14 +89,13 @@ public class CdcClient {
 
             new Thread(new WatchEtcd(RongUtil.etcdPrefix() + "config/cdc")).start();
         } catch (IOException e) {
-            logger.error("IOException:" + e.getMessage());
+            logger.error("IOException:", e);
             System.exit(1);
         } catch (TimeoutException e) {
-            logger.error("TimeoutException:" + e.getMessage());
+            logger.error("TimeoutException:", e);
             System.exit(1);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Exception:" + e.getMessage());
+            logger.error("Exception:", e);
             System.exit(1);
         }
     }

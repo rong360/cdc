@@ -50,8 +50,7 @@ public class Rong360CDC {
             client.registerMessageListener(new RabbitMessageListener());
             client.start();
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("Exception:" + e.getMessage());
+            logger.error("cdc start", e);
             System.exit(1);
         }
     }

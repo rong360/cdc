@@ -19,16 +19,13 @@ public class GuardEtcd implements Runnable {
 
     @Override
     public void run() {
-        // TODO Auto-generated method stub
         while (true) {
             try {
                 Thread.sleep(refreshInterval);
                 EtcdApi.keepAliveOnce(this.leaseId);
                 logger.info("keep lease ttl with etcd...");
             } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                logger.error("keep lease ttl with etcd {} ", e.getMessage());
+                logger.error("keep lease ttl with etcd error", e);
             }
         }
     }

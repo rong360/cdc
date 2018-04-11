@@ -25,8 +25,7 @@ public class EtcdApi {
                     ByteSequence.fromString(key),
                     ByteSequence.fromString(value)).get(timeOut, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("etcd set error key:{},value{},msg,{}", key, value, e.getMessage());
+            logger.error("etcd set error key:{},value{}", key, value, e);
         }
     }
 
@@ -37,8 +36,7 @@ public class EtcdApi {
             GetResponse response = getFuture.get(timeOut, TimeUnit.MILLISECONDS);
             return response.getKvs().size() > 0 ? response.getKvs().get(0).getValue().toStringUtf8() : "";
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("etcd get error key:{},msg,{}", key, e.getMessage());
+            logger.error("etcd get error key:{}", key, e);
         }
         return "";
     }
@@ -68,8 +66,7 @@ public class EtcdApi {
         try {
             EtcdClient.getInstance().getLeaseClient().keepAliveOnce(leaseId).get(timeOut, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.warn("keep alive leaseId:{} error", leaseId);
+            logger.warn("keep alive leaseId:{} error", leaseId, e);
         }
     }
 
@@ -86,13 +83,15 @@ public class EtcdApi {
         return setTtl(key, value, 60);
     }
 
-    public static void registerByLeaseId(String key, String value, long leaseId) {
+    public static boolean registerByLeaseId(String key, String value, long leaseId) {
         try {
             setTtlByLeaseId(key, value, leaseId);
         } catch (Exception e) {
             e.printStackTrace();
             logger.warn("registerByLeaseId key:{},leaseId:{}", key, leaseId);
+            return false;
         }
+        return true;
     }
 
 

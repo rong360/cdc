@@ -66,14 +66,14 @@ public class ColumnDao {
             tableColumnMap.put(mapKey, result);
 
         } catch (ClassNotFoundException e) {
-            log.error(e.getMessage());
+            log.error("db", e);
         } catch (SQLException e) {
-            log.error(e.getMessage());
+            log.error("db", e);
         } finally {
             try {
                 connection.close();
             } catch (SQLException e) {
-                log.error(e.getMessage());
+                log.error("db close", e);
             }
         }
         return result;

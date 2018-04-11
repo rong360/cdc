@@ -44,7 +44,7 @@ public class RabbitMessageListener implements CdcClient.MessageListener {
             try {
                 connection = factory.newConnection();
             } catch (IOException | TimeoutException e) {
-                logger.warn(e.getMessage());
+                logger.warn("create rabbitmq new connection", e);
             }
         }
         return connection;
@@ -76,13 +76,13 @@ public class RabbitMessageListener implements CdcClient.MessageListener {
                         qd.getMessage().getBytes("UTF-8"));
             }
         } catch (Exception e) {
-            logger.warn("publishBatch IOException:" + e.getMessage());
+            logger.warn("publishBatch IOException:", e);
             isSuc = false;
             try {
                 RabbitMessageListener.channel.close();
                 RabbitMessageListener.connection.close();
             } catch (Exception ec) {
-                ec.printStackTrace();
+                logger.warn("rabbit close", ec);
             }
             RabbitMessageListener.connection = null;
             RabbitMessageListener.channel = null;

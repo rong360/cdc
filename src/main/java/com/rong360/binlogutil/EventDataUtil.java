@@ -164,7 +164,7 @@ public class EventDataUtil {
             }
             uqd.setBeforeUpdate(mymap);
 
-            mymap = new HashMap<String, Object>();
+            mymap = new HashMap<>();
             j = 0;
             for (int i = includedColumns.nextSetBit(0); i >= 0; i = includedColumns.nextSetBit(i + 1)) {
                 column = columnMap.get(i);
@@ -203,7 +203,7 @@ public class EventDataUtil {
                 translateValue = String.valueOf(c);
             }
         } catch (UnsupportedEncodingException e) {
-            log.warn(e.getMessage());
+            log.warn("convert", e);
         }
 
         return translateValue;

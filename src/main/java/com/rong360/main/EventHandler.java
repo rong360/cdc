@@ -196,7 +196,7 @@ public class EventHandler extends Thread {
                     }
                 }
             } catch (Exception e) {
-                log.warn(e.getMessage());
+                log.warn("get event error", e);
             }
         }
     }

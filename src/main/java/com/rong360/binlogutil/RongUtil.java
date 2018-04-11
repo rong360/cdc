@@ -56,8 +56,7 @@ public class RongUtil {
         try {
             return DigestUtils.md5Hex(source.getBytes("UTF-8"));
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("getMD5 error:" + e.getMessage());
+            logger.error("getMD5 error", e);
         }
         return "";
     }

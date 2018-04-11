@@ -39,7 +39,7 @@ public class WatchEtcd implements Runnable {
                 }
                 GlobalConfig.loadCdcConf();
             } catch (Exception e) {
-                e.printStackTrace();
+                logger.warn("watch error", e);
                 if (watcher != null) {
                     watcher.close();
                 }
