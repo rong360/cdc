@@ -92,10 +92,11 @@ public class EventHandler extends Thread {
                 if (minFile > file) {
                     minFile = file;
                     minFileName = fileName;
+                    minPos = pos;
+                } else if (minFile == file
+                        && pos < minPos) {
+                    minPos = pos;
                 }
-            }
-            if (pos < minPos) {
-                minPos = pos;
             }
         }
         EtcdApi.set(RongUtil.getBinlogFileKey(), minFileName);
