@@ -100,6 +100,6 @@ public class EtcdApi {
         EtcdClient.getInstance().getKVClient().put(
                 ByteSequence.fromString(key),
                 ByteSequence.fromString(value),
-                PutOption.newBuilder().withLeaseId(leaseId).build()).get();
+                PutOption.newBuilder().withLeaseId(leaseId).build()).get(timeOut, TimeUnit.MILLISECONDS);
     }
 }

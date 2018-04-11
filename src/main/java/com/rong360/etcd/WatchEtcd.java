@@ -13,12 +13,14 @@ import org.slf4j.LoggerFactory;
  * @author liuchi
  * @date 2018/4/3
  */
-public class WatchEtcd implements Runnable{
+public class WatchEtcd implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(WatchEtcd.class);
     private String key;
-    public WatchEtcd(String key){
+
+    public WatchEtcd(String key) {
         this.key = key;
     }
+
     @Override
     public void run() {
 

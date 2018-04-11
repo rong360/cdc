@@ -12,6 +12,7 @@ import io.grpc.PickFirstBalancerFactory;
 public class EtcdClient {
     private static volatile EtcdClient sInstance;
     private Client client;
+
     private EtcdClient() {
         client = Client.builder().
                 endpoints(GlobalConfig.etcd_host).
@@ -34,8 +35,20 @@ public class EtcdClient {
     public Client getEtcdClient() {
         return client;
     }
-    public KV getKVClient() { return client.getKVClient();}
-    public Lock getLockClient() { return client.getLockClient();}
-    public Lease getLeaseClient() { return client.getLeaseClient();}
-    public Watch getWatchClient() {return client.getWatchClient();}
+
+    public KV getKVClient() {
+        return client.getKVClient();
+    }
+
+    public Lock getLockClient() {
+        return client.getLockClient();
+    }
+
+    public Lease getLeaseClient() {
+        return client.getLeaseClient();
+    }
+
+    public Watch getWatchClient() {
+        return client.getWatchClient();
+    }
 }

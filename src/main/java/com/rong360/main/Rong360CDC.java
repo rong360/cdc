@@ -21,17 +21,17 @@ public class Rong360CDC {
     public static void main(String[] args) {
 
         try {
-            if(args.length < 1){
+            if (args.length < 1) {
                 logger.error("invalid params");
                 return;
             }
             String instance = args[0];
-            if (StringUtils.isEmptyOrWhitespaceOnly(instance)){
+            if (StringUtils.isEmptyOrWhitespaceOnly(instance)) {
                 logger.error("invalid instance");
                 return;
             }
             String cluster = "master";
-            if (args.length ==2 && !StringUtils.isEmptyOrWhitespaceOnly(args[1]) ){
+            if (args.length == 2 && !StringUtils.isEmptyOrWhitespaceOnly(args[1])) {
                 cluster = args[1];
             }
 

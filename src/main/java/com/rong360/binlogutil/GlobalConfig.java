@@ -35,7 +35,7 @@ public class GlobalConfig {
 
     public static Integer ping_failed_maxretry = null;
     public static Integer connect_timedout = null;
-    public static String  mysqlTimeZone = "GMT+8";
+    public static String mysqlTimeZone = "GMT+8";
 
     public static boolean isNeedperThread = false;
     public static boolean isNeedseqThread = false;
@@ -49,8 +49,8 @@ public class GlobalConfig {
 
     private final static Logger logger = LoggerFactory.getLogger(GlobalConfig.class);
     private final static ReadWriteLock lock = new ReentrantReadWriteLock();//lock
-    private final static Integer FILTER_TYPE_PER =1;
-    private final static Integer FILTER_TYPE_SEQ =2;
+    private final static Integer FILTER_TYPE_PER = 1;
+    private final static Integer FILTER_TYPE_SEQ = 2;
 
     public static boolean filterByTableId(long tableId) {
 
@@ -67,7 +67,7 @@ public class GlobalConfig {
 
     /**
      * @param dbName:database name
-     * @param tblName：table name
+     * @param tblName：table   name
      * @return 1：Hit performance prioritization configuration 2：Hit seq priority configuration configuration 0：Missed
      */
     public static Integer filterTable(String dbName, String tblName) {
@@ -100,29 +100,29 @@ public class GlobalConfig {
 
     private static void logTableInfo(boolean prefix) {
         ConcurrentHashMap<String, Integer> tmpFilterMap;
-        if (prefix){
+        if (prefix) {
             tmpFilterMap = suffixMap;
-        }else{
+        } else {
             tmpFilterMap = filterMap;
         }
         StringBuffer sb = new StringBuffer();
         sb.append("==========start===========\n");
-        sb.append("********monitor "+(prefix?"prefix match":"")+" table********\n");
+        sb.append("********monitor " + (prefix ? "prefix match" : "") + " table********\n");
         boolean print = false;
         StringBuffer xn = new StringBuffer();
         StringBuffer sx = new StringBuffer();
         for (String s : tmpFilterMap.keySet()) {
             print = true;
             if (tmpFilterMap.get(s) == FILTER_TYPE_PER) {
-                xn.append(s + (prefix?"{suffix}":"")+"\n");
+                xn.append(s + (prefix ? "{suffix}" : "") + "\n");
             } else if (tmpFilterMap.get(s) == FILTER_TYPE_SEQ) {
-                sx.append(s + (prefix?"{suffix}":"")+"\n");
+                sx.append(s + (prefix ? "{suffix}" : "") + "\n");
             }
         }
-        if (xn.length()>0){
+        if (xn.length() > 0) {
             sb.append("performance first:\n" + xn);
         }
-        if (sx.length()>0){
+        if (sx.length() > 0) {
             sb.append("seq first:\n" + sx);
         }
         sb.append("==========end===========");
@@ -146,34 +146,34 @@ public class GlobalConfig {
             for (KeyValue keyValue : list) {
                 String[] tmpKey = keyValue.getKey().toStringUtf8().split("/");
                 String tmpVal = keyValue.getValue().toStringUtf8();
-                if (StringUtils.isEmptyOrWhitespaceOnly(tmpVal)){
+                if (StringUtils.isEmptyOrWhitespaceOnly(tmpVal)) {
                     continue;
                 }
-                switch (tmpKey[5]){
-                    case "ping_failed_max_retry" :
+                switch (tmpKey[5]) {
+                    case "ping_failed_max_retry":
                         ping_failed_maxretry = Integer.valueOf(tmpVal);
                         break;
-                    case "connection_timedout_inseconds" :
+                    case "connection_timedout_inseconds":
                         connect_timedout = Integer.valueOf(tmpVal);
                         break;
-                    case "mysqlTimeZone" :
+                    case "mysqlTimeZone":
                         mysqlTimeZone = tmpVal;
                         break;
-                    case "filter" :
-                        if (tmpVal.equals(Constant.FILTER_TABLE_ONLINE)){
+                    case "filter":
+                        if (tmpVal.equals(Constant.FILTER_TABLE_ONLINE)) {
                             isNeedperThread = true;
                             generateMap(tmpKey[6], tmpKey[7], 1);
                         }
                         break;
-                    case "seqfilter" :
-                        if (tmpVal.equals(Constant.FILTER_TABLE_ONLINE)){
+                    case "seqfilter":
+                        if (tmpVal.equals(Constant.FILTER_TABLE_ONLINE)) {
                             isNeedseqThread = true;
                             generateMap(tmpKey[6], tmpKey[7], 2);
                         }
                         break;
                 }
             }
-            if (filterMap.size() == 0  && suffixMap.size() == 0) {
+            if (filterMap.size() == 0 && suffixMap.size() == 0) {
                 throw new Exception("filter or seqfilter config is empty!");
             }
             logTableInfo(false);
@@ -204,20 +204,20 @@ public class GlobalConfig {
         loadCdcConf();
     }
 
-    public static void generateMap(String database, String table, int type) throws Exception{
+    public static void generateMap(String database, String table, int type) throws Exception {
         int x = table.indexOf("{suffix}");
         ConcurrentHashMap<String, Integer> tmpFilterMap;
         String key = RongUtil.generateTableKey(database, table);
         if (x > 0) {
             tmpFilterMap = suffixMap;
             key = RongUtil.generateTableKey(database, table.substring(0, x));
-        }else{
+        } else {
             tmpFilterMap = filterMap;
         }
-        if (suffixMap.get(key)!=null ||
-                filterMap.get(key)!=null) {
+        if (suffixMap.get(key) != null ||
+                filterMap.get(key) != null) {
             throw new Exception(database + "." + table + " exists both in seqfilter and filter");
-        }else{
+        } else {
             tmpFilterMap.put(key, type);
         }
     }

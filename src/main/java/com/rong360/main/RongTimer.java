@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 /**
  * 
  * @author zhangtao@rong360.com
- * CDC 定时任务类
+ * CDC Scheduled
  *
  */
 public class RongTimer implements Runnable{
