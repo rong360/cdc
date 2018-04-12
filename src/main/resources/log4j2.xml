@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Configuration status="WARN">
 	<properties>
-		<property name="LOG_HOME">.</property>
+		<property name="LOG_HOME">default</property>
 		<property name="LOG_Layout">[%d{HH:mm:ss:SSS}] [%t] %c{1}:%L - %m%n</property>
 	</properties>
 	<Appenders>
