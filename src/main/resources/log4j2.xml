@@ -10,7 +10,7 @@
 		</Console>
 
 		<RollingFile name="RollingFileInfo"
-			fileName="${sys:LOG_HOME}/application.log" filePattern="${sys:LOG_HOME}/application.log-%d{yyyy-MM-dd}">
+			fileName="${sys:LOG_HOME}/application.log" filePattern="${sys:LOG_HOME}/application.log-%d{yyyy-MM-dd}" createOnDemand="true">
 			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
 			<ThresholdFilter level="info" onMatch="ACCEPT"
 				onMismatch="DENY" />
@@ -22,7 +22,7 @@
 		</RollingFile>
 
 		<RollingFile name="RollingFileError"
-			fileName="${sys:LOG_HOME}/application.log.wf" filePattern="${sys:LOG_HOME}/application.log.wf-%d{yyyy-MM-dd}">
+			fileName="${sys:LOG_HOME}/application.log.wf" filePattern="${sys:LOG_HOME}/application.log.wf-%d{yyyy-MM-dd}" createOnDemand="true">
 			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
 			<ThresholdFilter level="warn" onMatch="ACCEPT"
 				onMismatch="DENY" />
@@ -34,7 +34,7 @@
 		</RollingFile>
 
 		<RollingFile name="RollingQueueFileInfo"
-					 fileName="${sys:LOG_HOME}/queue.log" filePattern="${sys:LOG_HOME}/queue.log-%d{yyyy-MM-dd}">
+					 fileName="${sys:LOG_HOME}/queue.log" filePattern="${sys:LOG_HOME}/queue.log-%d{yyyy-MM-dd}" createOnDemand="true">
 			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
 			<ThresholdFilter level="info" onMatch="ACCEPT"
 							 onMismatch="DENY" />
