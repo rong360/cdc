@@ -25,10 +25,10 @@ $ ./bin/etcd
 ```
 * Set the database configuration in etcd
 ```config
-cdc/master/admin/config/app/mysql/host 10.0.0.2
-cdc/master/admin/config/app/mysql/port 3306
-cdc/master/admin/config/app/mysql/username admin
-cdc/master/admin/config/app/mysql/password 123
+etcdctl put cdc/master/admin/config/app/mysql/host 10.0.0.2
+etcdctl put cdc/master/admin/config/app/mysql/port 3306
+etcdctl put cdc/master/admin/config/app/mysql/username admin
+etcdctl put cdc/master/admin/config/app/mysql/password 123
 ```
 * Start program
 ```java
