@@ -2,6 +2,7 @@ package com.rong360.etcd;
 
 import com.coreos.jetcd.*;
 import com.coreos.jetcd.data.ByteSequence;
+import com.mysql.jdbc.StringUtils;
 import com.rong360.binlogutil.GlobalConfig;
 import io.grpc.PickFirstBalancerFactory;
 
@@ -12,13 +13,19 @@ import io.grpc.PickFirstBalancerFactory;
 public class EtcdClient {
     private static volatile EtcdClient sInstance;
     private Client client;
+    private ClientBuilder clientBuilder;
 
     private EtcdClient() {
-        client = Client.builder().
+        clientBuilder = Client.builder().
                 endpoints(GlobalConfig.etcd_host).
-                user(ByteSequence.fromString(GlobalConfig.etcd_username)).
-                password(ByteSequence.fromString(GlobalConfig.etcd_password)).loadBalancerFactory(PickFirstBalancerFactory.getInstance()).
-                build();
+                loadBalancerFactory(PickFirstBalancerFactory.getInstance());
+
+        if (!StringUtils.isNullOrEmpty(GlobalConfig.etcd_username)
+                && !StringUtils.isNullOrEmpty(GlobalConfig.etcd_password)) {
+            clientBuilder.user(ByteSequence.fromString(GlobalConfig.etcd_username)).
+                    password(ByteSequence.fromString(GlobalConfig.etcd_password));
+        }
+        client = clientBuilder.build();
     }
 
     public static EtcdClient getInstance() {
