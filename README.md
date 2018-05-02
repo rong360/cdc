@@ -28,7 +28,7 @@ cdc/master/admin/config/app/mysql/username admin
 cdc/master/admin/config/app/mysql/password 123
 ```
 start program
-```
+```java
 CdcClient client = new CdcClient(etcdHost, etcdUsername, etcdPassword);
 client.setInstance("admin");
 client.setWatchAllTable(true);
