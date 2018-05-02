@@ -27,7 +27,7 @@ cdc/master/admin/config/app/mysql/port 3306
 cdc/master/admin/config/app/mysql/username admin
 cdc/master/admin/config/app/mysql/password 123
 ```
-start program
+Start program
 ```java
 CdcClient client = new CdcClient(etcdHost, etcdUsername, etcdPassword);
 client.setInstance("admin");
