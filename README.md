@@ -1,9 +1,17 @@
 # cdc
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-mysql binlog parser json into rabbitmq or others, such as kafka
+mysql binlog parser json into rabbitmq or others(such as kafka)
 ## What is cdc?
-change data capture
+change data capture, Key Features
+- High availability, cluster deployment
+Table level filter binlog file
+Supports all mysql field parsing
+Automatically save the binlog location node, smooth upgrade and restart, data is not lost
+Configure centralized management
+Operational status monitoring
+Dynamically loading table configuration files
+Support for adding multiple exported data sources for easy expansion to kafka or other
 ## Java Versions
 
 Java 8 or above is required.
