@@ -5,7 +5,9 @@ import com.coreos.jetcd.data.KeyValue;
 import com.coreos.jetcd.options.GetOption;
 import com.mysql.jdbc.StringUtils;
 import com.rong360.etcd.EtcdClient;
+import com.rong360.main.CdcClient;
 import com.rong360.main.Constant;
+import com.rong360.rabbitmq.RabbitMessageListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,6 +73,9 @@ public class GlobalConfig {
      * @return 1：Hit performance prioritization configuration 2：Hit seq priority configuration configuration 0：Missed
      */
     public static Integer filterTable(String dbName, String tblName) {
+        if (CdcClient.watchAllTable){
+            return FILTER_TYPE_PER;
+        }
         lock.readLock().lock();
         String fullName = RongUtil.generateTableKey(dbName, tblName);
         try {
@@ -132,6 +137,11 @@ public class GlobalConfig {
     }
 
     public synchronized static void loadCdcConf() throws Exception {
+        if (CdcClient.watchAllTable){
+            isNeedperThread = true;
+            logger.info("watch all table");
+            return;
+        }
         lock.writeLock().lock();
         try {
             String cdcConfig = RongUtil.etcdPrefix() + "config/cdc";
@@ -201,10 +211,22 @@ public class GlobalConfig {
                 f.set(obj, tmpVal);
             }
         }
+        boolean containRb = false;
+        List<CdcClient.MessageListener> ml = CdcClient.getMessageListeners();
+        for (CdcClient.MessageListener messageListener : ml) {
+            if (messageListener instanceof RabbitMessageListener) {
+                containRb = true;
+                break;
+            }
+        }
         Field[] allConfigField = c.getFields();
         for (Field configF : allConfigField) {
+            String name = configF.getName().split("_")[0];
+            if (name.equals("rabbitmq") && !containRb) {
+                continue;
+            }
             if (configF.get(obj) == null) {
-                logger.error("{} is not config in etcd", configF.getName());
+                logger.error("{}{}{} is not config in etcd", appConfig, "/", configF.getName().replace("_", "/"));
                 throw new Exception("no config in etcd");
             }
         }

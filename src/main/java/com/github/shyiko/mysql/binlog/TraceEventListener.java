@@ -52,19 +52,19 @@ public class TraceEventListener implements BinaryLogClient.EventListener {
 		}else if(eventType.equals("QUERY")){
 			QueryEventData ded = event.getData();
 			String sql = ded.getSql().replaceAll("`", "");
-			Pattern pattern = Pattern.compile("(alter)(\\s+)(table)(\\s+)(\\w+)(\\s+)(.*)",Pattern.CASE_INSENSITIVE);
+			Pattern pattern = Pattern.compile("(alter)(\\s+)(table)(\\s+)([\\w|.]+)(\\s+)(.*)",Pattern.CASE_INSENSITIVE);
 			Matcher matcher = pattern.matcher(sql);
 			if(matcher.find()){
-				tblName = matcher.group(5);
+				tblName = getTable(matcher.group(5));
 				dbName = ded.getDatabase();
 				log.info( dbName + ":" + tblName + " format maybe changed,clear cache!");
 				new ColumnDao().removeCache(dbName, tblName);   			
 			}
-			pattern = Pattern.compile("(rename)(\\s)(table)(\\s+)(\\w+)(\\s+)(to)(\\s+)(.*)",Pattern.CASE_INSENSITIVE);
+			pattern = Pattern.compile("(rename)(\\s)(table)(\\s+)([\\w|.]+)(\\s+)(to)(\\s+)(.*)",Pattern.CASE_INSENSITIVE);
 			matcher = pattern.matcher(sql);
 			if(matcher.find()){
-				String srcTbl = matcher.group(5);
-				String toTbl = matcher.group(9);
+				String srcTbl = getTable(matcher.group(5));
+				String toTbl = getTable(matcher.group(9));
 				dbName = ded.getDatabase();
 				log.info("rename " + srcTbl + " to " + toTbl);
 				new ColumnDao().removeCache(dbName, srcTbl);
@@ -75,6 +75,16 @@ public class TraceEventListener implements BinaryLogClient.EventListener {
 		}
 
 	}
+
+	private String getTable(String table){
+		String[] tableInfo = table.split("\\.");
+		if (tableInfo.length == 2){
+			return tableInfo[1];
+		}else{
+			return table;
+		}
+	}
+
 	private void eventRouter(Event event){
 		String eventType = event.getHeader().getEventType().toString();
 		String orgName[] = null;

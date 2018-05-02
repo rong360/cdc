@@ -1,9 +1,6 @@
 package com.rong360.rabbitmq;
 
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
+import com.rabbitmq.client.*;
 import com.rong360.binlogutil.GlobalConfig;
 import com.rong360.main.CdcClient;
 import com.rong360.model.QueueData;
@@ -12,8 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeoutException;
 
 /**
@@ -22,45 +18,44 @@ import java.util.concurrent.TimeoutException;
 public class RabbitMessageListener implements CdcClient.MessageListener {
     private final static Logger logger = LoggerFactory.getLogger(RabbitMessageListener.class);
     private volatile static Connection connection = null;
-    private volatile static Channel channel = null;
+    private static ConcurrentHashMap<String, Object> channelMap = new ConcurrentHashMap<>();
 
-    private static Connection getConnection() {
+    private static synchronized Connection getConnection() {
         if (connection == null) {
             logger.info("connection is null,init it!");
             ConnectionFactory factory = new ConnectionFactory();
-            factory.setHost(GlobalConfig.rabbitmq_host);
-            factory.setPort(GlobalConfig.rabbitmq_port);
+            String[] tmp = GlobalConfig.rabbitmq_host.split(",");
+            Address[] addresses = new Address[tmp.length];
+            for (int i = 0; i < tmp.length; i++) {
+                addresses[i] = new Address(tmp[i], GlobalConfig.rabbitmq_port);
+            }
             factory.setVirtualHost(GlobalConfig.rabbitmq_vhost);
             factory.setUsername(GlobalConfig.rabbitmq_username);
             factory.setPassword(GlobalConfig.rabbitmq_password);
-            factory.setNetworkRecoveryInterval(5000);
-            //指定连接池
-            ExecutorService service = Executors.newFixedThreadPool(5);
-            factory.setSharedExecutor(service);
+            factory.setNetworkRecoveryInterval(100);
+
             factory.setTopologyRecoveryEnabled(false);
             factory.setAutomaticRecoveryEnabled(true);
             factory.setConnectionTimeout(5 * 1000);
-            factory.setRequestedHeartbeat(5);
+            factory.setRequestedHeartbeat(20);
             try {
-                connection = factory.newConnection();
+                connection = factory.newConnection(addresses);
             } catch (IOException | TimeoutException e) {
+                connection = null;
                 logger.warn("create rabbitmq new connection", e);
             }
         }
         return connection;
     }
 
-    public static Channel getChannel() {
+    public static Channel getChannel() throws Exception {
+        String threadName = Thread.currentThread().getName();
+        Channel channel;
+        channel = (Channel) channelMap.get(threadName);
         if (channel == null) {
-            try {
-                synchronized (RabbitMessageListener.class) {
-                    if (channel == null) {
-                        channel = getConnection().createChannel();
-                    }
-                }
-            } catch (Exception e) {
-                logger.warn("get channel Exception:{}", e.getMessage());
-            }
+            logger.info("thread:{},channel is null ,create one", threadName);
+            channel = getConnection().createChannel();
+            channelMap.put(threadName, channel);
         }
         return channel;
     }
@@ -78,14 +73,6 @@ public class RabbitMessageListener implements CdcClient.MessageListener {
         } catch (Exception e) {
             logger.warn("publishBatch IOException:", e);
             isSuc = false;
-            try {
-                RabbitMessageListener.channel.close();
-                RabbitMessageListener.connection.close();
-            } catch (Exception ec) {
-                logger.warn("rabbit close", ec);
-            }
-            RabbitMessageListener.connection = null;
-            RabbitMessageListener.channel = null;
         }
         return isSuc;
     }

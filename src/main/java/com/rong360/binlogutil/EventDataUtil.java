@@ -3,6 +3,7 @@ package com.rong360.binlogutil;
 import com.rong360.model.DeleteQueueData;
 import com.rong360.model.InsertQueueData;
 import com.rong360.model.UpdateQueueData;
+import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -109,39 +110,80 @@ public class EventDataUtil {
     }
 
     public static ArrayList<InsertQueueData> getInsertEventData(BitSet includedColumns, List<Serializable[]> rows, HashMap<Integer, String> columnMap) {
-        String column = "";
-        String value = "";
         ArrayList<InsertQueueData> resultList = new ArrayList<InsertQueueData>();
         for (Serializable[] row : rows) {
             InsertQueueData iqd = new InsertQueueData();
-            HashMap<String, Object> mymap = new HashMap<String, Object>();
-            int j = 0;
-            for (int i = includedColumns.nextSetBit(0); i >= 0; i = includedColumns.nextSetBit(i + 1)) {
-                column = columnMap.get(i);
-                value = convert(row, j++);
-                mymap.put(column, value);
-            }
-            iqd.setAfterInsert(mymap);
+            iqd.setAfterInsert(getMyMap(row, includedColumns, columnMap));
             resultList.add(iqd);
         }
         return resultList;
 
     }
 
+    private static HashMap<String, Object> getMyMap(Serializable[] row, BitSet includedColumns, HashMap<Integer, String> columnMap) {
+        HashMap<String, Object> mymap = new HashMap<>();
+        String value;
+        int j = 0;
+        for (int i = includedColumns.nextSetBit(0); i >= 0; i = includedColumns.nextSetBit(i + 1)) {
+            JSONObject info = JSONObject.fromObject(columnMap.get(i));
+            value = convert(row, j++);
+            value = convertByType(value, info.getString("type"), info.get("list"));
+            mymap.put(info.getString("name"), value);
+        }
+        return mymap;
+    }
+
+    private static String convertByType(String value, String type, Object list) {
+        if (!(list instanceof JSONArray)) {
+            return value;
+        }
+        try {
+            int intValue = 0;
+            switch (type) {
+                case "enum":
+                    intValue = Integer.parseInt(value);
+                    if (intValue == 0) {
+                        value = "";
+                        break;
+                    }
+                    value = ((JSONArray) list).getString(intValue - 1);
+                    break;
+                case "set":
+                    intValue = Integer.parseInt(value);
+                    if (intValue == 0) {
+                        value = "";
+                        break;
+                    }
+                    StringBuilder valueT = new StringBuilder();
+                    int i = 0, j;
+                    while (intValue > 0) {
+                        j = intValue & ((int) Math.pow(2, i));
+                        if (j > 0) {
+                            valueT.append(((JSONArray) list).getString(i));
+                            intValue = intValue - j;
+                            if (intValue > 0) {
+                                valueT.append(",");
+                            }
+                        }
+                        i++;
+                    }
+                    if (!valueT.toString().isEmpty()) {
+                        value = valueT.toString();
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            log.warn("convertByType error", e);
+        } finally {
+            return value;
+        }
+    }
+
     public static ArrayList<DeleteQueueData> getDeleteEventData(BitSet includedColumns, HashMap<Integer, String> columnMap, List<Serializable[]> rows) {
-        String column = "";
-        String value = "";
-        ArrayList<DeleteQueueData> resultList = new ArrayList<DeleteQueueData>();
+        ArrayList<DeleteQueueData> resultList = new ArrayList<>();
         for (Serializable[] row : rows) {
             DeleteQueueData dqd = new DeleteQueueData();
-            HashMap<String, Object> mymap = new HashMap<String, Object>();
-            int j = 0;
-            for (int i = includedColumns.nextSetBit(0); i >= 0; i = includedColumns.nextSetBit(i + 1)) {
-                column = columnMap.get(i);
-                value = convert(row, j++);
-                mymap.put(column, value);
-            }
-            dqd.setAftertDelete(mymap);
+            dqd.setAftertDelete(getMyMap(row, includedColumns, columnMap));
             resultList.add(dqd);
         }
         return resultList;
@@ -149,29 +191,11 @@ public class EventDataUtil {
     }
 
     public static ArrayList<UpdateQueueData> getUpdateEventData(BitSet beforeColumns, BitSet includedColumns, HashMap<Integer, String> columnMap, List<Map.Entry<Serializable[], Serializable[]>> rows) {
-        String column = "";
-        String value = "";
         ArrayList<UpdateQueueData> resultList = new ArrayList<UpdateQueueData>();
         for (Map.Entry<Serializable[], Serializable[]> row : rows) {
             UpdateQueueData uqd = new UpdateQueueData();
-
-            HashMap<String, Object> mymap = new HashMap<String, Object>();
-            int j = 0;
-            for (int i = beforeColumns.nextSetBit(0); i >= 0; i = beforeColumns.nextSetBit(i + 1)) {
-                column = columnMap.get(i);
-                value = convert(row.getKey(), j++);
-                mymap.put(column, value);
-            }
-            uqd.setBeforeUpdate(mymap);
-
-            mymap = new HashMap<>();
-            j = 0;
-            for (int i = includedColumns.nextSetBit(0); i >= 0; i = includedColumns.nextSetBit(i + 1)) {
-                column = columnMap.get(i);
-                value = convert(row.getValue(), j++);
-                mymap.put(column, value);
-            }
-            uqd.setAfterUpdate(mymap);
+            uqd.setBeforeUpdate(getMyMap(row.getKey(), beforeColumns, columnMap));
+            uqd.setAfterUpdate(getMyMap(row.getValue(), includedColumns, columnMap));
             resultList.add(uqd);
         }
         return resultList;

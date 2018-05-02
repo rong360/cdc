@@ -5,7 +5,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author liuchi
- * @date 2018/4/3
+ * 2018/4/3
  */
 public class GuardEtcd implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(GuardEtcd.class);

@@ -1,11 +1,13 @@
 package com.rong360.database;
 
 import com.rong360.binlogutil.GlobalConfig;
+import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.*;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,7 +44,7 @@ public class ColumnDao {
             return result;
         }
         result = new HashMap<Integer, String>();
-        String sql = "select column_name,ordinal_position from INFORMATION_SCHEMA.COLUMNS where table_schema = ? and table_name = ?";
+        String sql = "select column_name,ordinal_position,COLUMN_TYPE from INFORMATION_SCHEMA.COLUMNS where table_schema = ? and table_name = ?";
         Connection connection = null;
         try {
             Class.forName("com.mysql.jdbc.Driver");
@@ -58,7 +60,12 @@ public class ColumnDao {
                 while (rs.next()) {
                     Integer position = rs.getInt(2);
                     String columnName = rs.getString(1);
-                    result.put(position - 1, columnName);
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("name", columnName);
+                    String type = rs.getString(3);
+                    getType(type, map);
+                    JSONObject obj = JSONObject.fromObject(map);
+                    result.put(position - 1, obj.toString());
                 }
             }
             rs.close();
@@ -77,6 +84,30 @@ public class ColumnDao {
             }
         }
         return result;
+    }
+
+    public static void getType(String type, Map<String, Object> map) {
+        Pattern pattern = Pattern.compile("(enum)\\((.*)\\)", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = pattern.matcher(type);
+        map.put("type", type);
+        String[] list = null;
+        if (matcher.find()) {
+            map.put("type", "enum");
+            list = matcher.group(2).split(",");
+        } else {
+            pattern = Pattern.compile("(set)\\((.*)\\)", Pattern.CASE_INSENSITIVE);
+            matcher = pattern.matcher(type);
+            if (matcher.find()) {
+                map.put("type", "set");
+                list = matcher.group(2).split(",");
+            }
+        }
+        if (list != null) {
+            for (int i = 0; i < list.length; i++) {
+                list[i] = list[i].substring(1, list[i].length() - 1);
+            }
+        }
+        map.put("list", list);
     }
 
     public static void main(String[] args) {

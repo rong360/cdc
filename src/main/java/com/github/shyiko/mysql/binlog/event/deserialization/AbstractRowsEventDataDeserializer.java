@@ -19,6 +19,11 @@ import com.github.shyiko.mysql.binlog.event.EventData;
 import com.github.shyiko.mysql.binlog.event.TableMapEventData;
 import com.github.shyiko.mysql.binlog.io.ByteArrayInputStream;
 import com.rong360.binlogutil.GlobalConfig;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.io.ParseException;
+import com.vividsolutions.jts.io.WKBReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -67,6 +72,7 @@ public abstract class AbstractRowsEventDataDeserializer<T extends EventData> imp
 
     private static final int[] DIG_TO_BYTES = {0, 1, 1, 2, 2, 3, 3, 4, 4, 4};
     private static final int DIG_PER_DEC = 9;
+    public static final Logger logger = LoggerFactory.getLogger(AbstractRowsEventDataDeserializer.class);
 
     protected final Map<Long, TableMapEventData> tableMapEventByTableId;
 
@@ -325,9 +331,56 @@ public abstract class AbstractRowsEventDataDeserializer<T extends EventData> imp
         return inputStream.readLong(length);
     }
 
-    protected byte[] deserializeGeometry(int meta, ByteArrayInputStream inputStream) throws IOException {
+    protected String deserializeGeometry(int meta, ByteArrayInputStream inputStream) throws IOException {
         int dataLength = inputStream.readInteger(meta);
-        return inputStream.read(dataLength);
+        byte[] geometryAsBytes = inputStream.read(dataLength);
+        return getGeometryFromBytes(geometryAsBytes);
+    }
+
+
+
+    private String getGeometryFromBytes(byte[] geometryAsBytes){
+        Geometry dbGeometry;
+
+        if (geometryAsBytes.length < 5) {
+            logger.warn("Invalid geometry inputStream - less than five bytes {}", geometryAsBytes);
+            return "";
+        }
+
+        //first four bytes of the geometry are the SRID,
+        //followed by the actual WKB.  Determine the SRID
+        //here
+        byte[] sridBytes = new byte[4];
+        System.arraycopy(geometryAsBytes, 0, sridBytes, 0, 4);
+        boolean bigEndian = (geometryAsBytes[4] == 0x00);
+
+        int srid = 0;
+        if (bigEndian) {
+            for (int i = 0; i < sridBytes.length; i++) {
+                srid = (srid << 8) + (sridBytes[i] & 0xff);
+            }
+        } else {
+            for (int i = 0; i < sridBytes.length; i++) {
+                srid += (sridBytes[i] & 0xff) << (8 * i);
+            }
+        }
+
+        try {
+            //use the JTS WKBReader for WKB parsing
+            WKBReader wkbReader = new WKBReader();
+
+            //copy the byte array, removing the first four
+            //SRID bytes
+            byte[] wkb = new byte[geometryAsBytes.length - 4];
+            System.arraycopy(geometryAsBytes, 4, wkb, 0, wkb.length);
+            dbGeometry = wkbReader.read(wkb);
+            dbGeometry.setSRID(srid);
+            return dbGeometry.toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+            logger.warn("Invalid geometry inputStream - wkbReader reader error {}", geometryAsBytes);
+        }
+        return "";
     }
 
     // checkstyle, please ignore ParameterNumber for the next line

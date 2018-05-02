@@ -86,48 +86,48 @@
             <artifactId>commons-codec</artifactId>
             <version>1.10</version>
         </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.vividsolutions</groupId>
+            <artifactId>jts</artifactId>
+            <version>1.13</version>
+        </dependency>
+
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>3.0.2</version>
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.rong360.main.Rong360CDC</mainClass>
-                            <addClasspath>true</addClasspath>
-                            <classpathPrefix>classes/lib</classpathPrefix>
-                        </manifest>
-                    </archive>
-                    <classesDirectory>
-                    </classesDirectory>
-                </configuration>
-            </plugin>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
 
+    <scm>
+        <url>https://github.com/rong360/cdc</url>
+        <connection>git@github.com:rong360/cdc.git</connection>
+        <developerConnection>http://www.rong360.com</developerConnection>
+    </scm>
 
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.0</version>
-                <executions>
-                    <execution>
-                        <id>copy-dependencies</id>
-                        <phase>prepare-package</phase>
-                        <goals>
-                            <goal>copy-dependencies</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <includeTypes>jar</includeTypes>
-                    <overWriteSnapshots>true</overWriteSnapshots>
-                    <type>jar</type>
-                    <outputDirectory>${project.build.directory}/classes/lib</outputDirectory>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <name>zhangtao</name>
+            <email>zhangtao@rong360.com</email>
+        </developer>
+        <developer>
+            <name>liuchi</name>
+            <email>liuchi@rong360.com</email>
+        </developer>
+    </developers>
 </project>

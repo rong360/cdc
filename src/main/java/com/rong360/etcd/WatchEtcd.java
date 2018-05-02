@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * @author liuchi
- * @date 2018/4/3
+ * 2018/4/3
  */
 public class WatchEtcd implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(WatchEtcd.class);

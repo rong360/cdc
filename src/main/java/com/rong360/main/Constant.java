@@ -4,7 +4,7 @@ package com.rong360.main;
  * Constant definition
  *
  * @author liuchi
- * @date 2018/4/9
+ * 2018/4/9
  */
 public class Constant {
     //Register etcd successfully

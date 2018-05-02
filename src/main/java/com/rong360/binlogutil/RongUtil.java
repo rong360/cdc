@@ -29,7 +29,7 @@ public class RongUtil {
     }
 
     public static String etcdPrefix() {
-        return "rong360cdc/" + CdcClient.cluster + "/" + CdcClient.instance + "/";
+        return CdcClient.uniEtcdKeyPrefix + "/" + CdcClient.cluster + "/" + CdcClient.instance + "/";
     }
 
     public static String generateTableKey(String database, String table) {
@@ -47,10 +47,10 @@ public class RongUtil {
     /**
      * Generate md5
      *
-     * @param source
-     * @return
+     * @param source md5 string
+     * @return md5
      * @author liuchi
-     * @date 20180201
+     * 20180201
      */
     public static String getMd5(String source) {
         try {

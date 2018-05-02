@@ -16,8 +16,7 @@
 package com.github.shyiko.mysql.binlog.event;
 
 /**
- * @see <a href="https://dev.mysql.com/doc/internals/en/event-meanings.html">Event Meanings</a> for the original
- * documentation.
+ * @see <a href="https://dev.mysql.com/doc/internals/en/event-meanings.html">Event Meanings</a>
  * @author <a href="mailto:stanley.shyiko@gmail.com">Stanley Shyiko</a>
  */
 public enum EventType {

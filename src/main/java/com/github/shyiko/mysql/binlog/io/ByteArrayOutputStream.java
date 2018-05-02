@@ -35,6 +35,9 @@ public class ByteArrayOutputStream extends OutputStream {
 
     /**
      * Write int in little-endian format.
+     * @throws IOException exc
+     * @param value value
+     * @param length length
      */
     public void writeInteger(int value, int length) throws IOException {
         for (int i = 0; i < length; i++) {
@@ -44,6 +47,9 @@ public class ByteArrayOutputStream extends OutputStream {
 
     /**
      * Write long in little-endian format.
+     * @throws IOException exc
+     * @param value value
+     * @param length length
      */
     public void writeLong(long value, int length) throws IOException {
         for (int i = 0; i < length; i++) {
@@ -57,6 +63,8 @@ public class ByteArrayOutputStream extends OutputStream {
 
     /**
      * @see ByteArrayInputStream#readZeroTerminatedString()
+     * @throws IOException exc
+     * @param value writer zero
      */
     public void writeZeroTerminatedString(String value) throws IOException {
         write(value.getBytes());

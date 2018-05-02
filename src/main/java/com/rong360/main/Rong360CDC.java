@@ -13,7 +13,7 @@ import java.util.Properties;
 
 /**
  * @author liuchi
- * @date 2018/4/8
+ * 2018/4/8
  */
 public class Rong360CDC {
     private final static Logger logger = LoggerFactory.getLogger(CdcClient.class);
@@ -44,7 +44,7 @@ public class Rong360CDC {
             String etcdUsername = prop.getProperty("etcd.username");
             String etcdPassword = prop.getProperty("etcd.password");
             in.close();
-            CdcClient client = new CdcClient(etcdHost, etcdUsername, etcdPassword);
+            CdcClient client = new CdcClient(etcdHost, etcdUsername, etcdPassword, "rong360cdc");
             client.setCluster(cluster);
             client.setInstance(instance);
             client.registerMessageListener(new RabbitMessageListener());

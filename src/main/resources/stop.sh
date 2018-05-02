@@ -18,11 +18,14 @@ do
         exit 1;;
     esac
 done
-
+fileext="$"
+if [  -n "$master" ] ;then
+    fileext=" "
+fi
 IFS=, DIRS=($instance)
 if  [ -n "$all" ] ;then
     echo "stopping all cdc service"
-    ps -ef | grep com.rong360.main.Rong360CDC | grep -v grep | awk  '{print $2}' | xargs kill
+    ps -ef | grep com.rong360.main.Rong360CDC | grep -v grep | awk  '{print $2}' | xargs kill -15
     sleep 1
 elif [ ! -n "$instance" ] ;then
     echo "specify instance e.g. -i instance_a,instance_b or -a"
@@ -31,7 +34,7 @@ fi
 for file in ${DIRS[@]}
   do
   	echo "stopping "$master" cluster's instance:"$file
-    ps -ef | grep com.rong360.main.Rong360CDC | grep "$file"|grep "$master" | grep -v grep | awk  '{print $2}' | xargs kill
+    ps -ef | grep com.rong360.main.Rong360CDC | grep "$file$fileext"|grep "$master" | grep -v grep | awk  '{print $2}' | xargs kill -15
     sleep 1
   done
 

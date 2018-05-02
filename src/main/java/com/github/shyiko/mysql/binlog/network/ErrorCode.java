@@ -2178,7 +2178,7 @@ public final class ErrorCode {
     public static final int ER_TOO_BIG_PRECISION = 1426;
 
     /**
-     * For float(M,D), double(M,D) or decimal(M,D), M must be >= D (column '%-.192s').
+     * For float(M,D), double(M,D) or decimal(M,D), M must be &gt;= D (column '%-.192s').
      */
     public static final int ER_M_BIGGER_THAN_D = 1427;
 
@@ -3146,7 +3146,7 @@ public final class ErrorCode {
     public static final int WARN_NO_MASTER_INFO = 1617;
 
     /**
-     * <%-.64s> option ignored
+     * %-.64s option ignored
      */
     public static final int WARN_OPTION_IGNORED = 1618;
 
@@ -3463,7 +3463,7 @@ public final class ErrorCode {
     public static final int ER_SLAVE_CANT_CREATE_CONVERSION = 1678;
 
     /**
-     * Cannot modify @@session.binlog_format inside a transaction
+     * Cannot modify session.binlog_format inside a transaction
      */
     public static final int ER_INSIDE_TRANSACTION_PREVENTS_SWITCH_BINLOG_FORMAT = 1679;
 
@@ -3493,7 +3493,7 @@ public final class ErrorCode {
     public static final int ER_WARN_I_S_SKIPPED_TABLE = 1684;
 
     /**
-     * Cannot modify @@session.binlog_direct_non_transactional_updates inside a transaction
+     * Cannot modify session.binlog_direct_non_transactional_updates inside a transaction
      */
     public static final int ER_INSIDE_TRANSACTION_PREVENTS_SWITCH_BINLOG_DIRECT = 1685;
 
@@ -3539,7 +3539,7 @@ public final class ErrorCode {
     public static final int ER_BINLOG_UNSAFE_MIXED_STATEMENT = 1693;
 
     /**
-     * Cannot modify @@session.sql_log_bin inside a transaction
+     * Cannot modify session.sql_log_bin inside a transaction
      */
     public static final int ER_INSIDE_TRANSACTION_PREVENTS_SWITCH_SQL_LOG_BIN = 1694;
 
@@ -3926,12 +3926,12 @@ public final class ErrorCode {
     public static final int ER_VARIABLE_NOT_SETTABLE_IN_TRANSACTION = 1766;
 
     /**
-     * The system variable @@SESSION.GTID_NEXT has the value %.200s, which is not listed in @@SESSION.GTID_NEXT_LIST.
+     * The system variable SESSION.GTID_NEXT has the value %.200s, which is not listed in SESSION.GTID_NEXT_LIST.
      */
     public static final int ER_GTID_NEXT_IS_NOT_IN_GTID_NEXT_LIST = 1767;
 
     /**
-     * The system variable @@SESSION.GTID_NEXT cannot change inside a transaction.
+     * The system variable SESSION.GTID_NEXT cannot change inside a transaction.
      */
     public static final int ER_CANT_CHANGE_GTID_NEXT_IN_TRANSACTION_WHEN_GTID_NEXT_LIST_IS_NULL = 1768;
 
@@ -3941,7 +3941,7 @@ public final class ErrorCode {
     public static final int ER_SET_STATEMENT_CANNOT_INVOKE_FUNCTION = 1769;
 
     /**
-     * The system variable @@SESSION.GTID_NEXT cannot be 'AUTOMATIC' when @@SESSION.GTID_NEXT_LIST is non-NULL.
+     * The system variable SESSION.GTID_NEXT cannot be 'AUTOMATIC' when SESSION.GTID_NEXT_LIST is non-NULL.
      */
     public static final int ER_GTID_NEXT_CANT_BE_AUTOMATIC_IF_GTID_NEXT_LIST_IS_NON_NULL = 1770;
 
@@ -3978,66 +3978,66 @@ public final class ErrorCode {
     public static final int ER_BAD_SLAVE_AUTO_POSITION = 1776;
 
     /**
-     * CHANGE MASTER TO MASTER_AUTO_POSITION = 1 can only be executed when @@GLOBAL.GTID_MODE = ON.
+     * CHANGE MASTER TO MASTER_AUTO_POSITION = 1 can only be executed when GLOBAL.GTID_MODE = ON.
      */
     public static final int ER_AUTO_POSITION_REQUIRES_GTID_MODE_ON = 1777;
 
     /**
-     * Cannot execute statements with implicit commit inside a transaction when @@SESSION.GTID_NEXT != AUTOMATIC.
+     * Cannot execute statements with implicit commit inside a transaction when SESSION.GTID_NEXT != AUTOMATIC.
      */
     public static final int ER_CANT_DO_IMPLICIT_COMMIT_IN_TRX_WHEN_GTID_NEXT_IS_SET = 1778;
 
     /**
-     * @@GLOBAL.GTID_MODE = ON or UPGRADE_STEP_2 requires @@GLOBAL.ENFORCE_GTID_CONSISTENCY = 1.
+     * GLOBAL.GTID_MODE = ON or UPGRADE_STEP_2 requires GLOBAL.ENFORCE_GTID_CONSISTENCY = 1.
      */
     public static final int ER_GTID_MODE_2_OR_3_REQUIRES_ENFORCE_GTID_CONSISTENCY_ON = 1779;
 
     /**
-     * @@GLOBAL.GTID_MODE = ON or UPGRADE_STEP_1 or UPGRADE_STEP_2 requires --log-bin and --log-slave-updates.
+     * GLOBAL.GTID_MODE = ON or UPGRADE_STEP_1 or UPGRADE_STEP_2 requires --log-bin and --log-slave-updates.
      */
     public static final int ER_GTID_MODE_REQUIRES_BINLOG = 1780;
 
     /**
-     * @@SESSION.GTID_NEXT cannot be set to UUID:NUMBER when @@GLOBAL.GTID_MODE = OFF.
+     * SESSION.GTID_NEXT cannot be set to UUID:NUMBER when GLOBAL.GTID_MODE = OFF.
      */
     public static final int ER_CANT_SET_GTID_NEXT_TO_GTID_WHEN_GTID_MODE_IS_OFF = 1781;
 
     /**
-     * @@SESSION.GTID_NEXT cannot be set to ANONYMOUS when @@GLOBAL.GTID_MODE = ON.
+     * SESSION.GTID_NEXT cannot be set to ANONYMOUS when GLOBAL.GTID_MODE = ON.
      */
     public static final int ER_CANT_SET_GTID_NEXT_TO_ANONYMOUS_WHEN_GTID_MODE_IS_ON = 1782;
 
     /**
-     * @@SESSION.GTID_NEXT_LIST cannot be set to a non-NULL value when @@GLOBAL.GTID_MODE = OFF.
+     * SESSION.GTID_NEXT_LIST cannot be set to a non-NULL value when GLOBAL.GTID_MODE = OFF.
      */
     public static final int ER_CANT_SET_GTID_NEXT_LIST_TO_NON_NULL_WHEN_GTID_MODE_IS_OFF = 1783;
 
     /**
-     * Found a Gtid_log_event or Previous_gtids_log_event when @@GLOBAL.GTID_MODE = OFF.
+     * Found a Gtid_log_event or Previous_gtids_log_event when GLOBAL.GTID_MODE = OFF.
      */
     public static final int ER_FOUND_GTID_EVENT_WHEN_GTID_MODE_IS_OFF = 1784;
 
     /**
-     * When @@GLOBAL.ENFORCE_GTID_CONSISTENCY = 1, updates to non-transactional tables can only be done in either
+     * When GLOBAL.ENFORCE_GTID_CONSISTENCY = 1, updates to non-transactional tables can only be done in either
      * autocommitted statements or single-statement transactions, and never in the same statement as updates to
      * transactional tables.
      */
     public static final int ER_GTID_UNSAFE_NON_TRANSACTIONAL_TABLE = 1785;
 
     /**
-     * CREATE TABLE ... SELECT is forbidden when @@GLOBAL.ENFORCE_GTID_CONSISTENCY = 1.
+     * CREATE TABLE ... SELECT is forbidden when GLOBAL.ENFORCE_GTID_CONSISTENCY = 1.
      */
     public static final int ER_GTID_UNSAFE_CREATE_SELECT = 1786;
 
     /**
-     * When @@GLOBAL.ENFORCE_GTID_CONSISTENCY = 1, the statements CREATE TEMPORARY TABLE and DROP TEMPORARY TABLE can
+     * When GLOBAL.ENFORCE_GTID_CONSISTENCY = 1, the statements CREATE TEMPORARY TABLE and DROP TEMPORARY TABLE can
      * be executed in a non-transactional context only, and require that AUTOCOMMIT = 1.
      */
     public static final int ER_GTID_UNSAFE_CREATE_DROP_TEMPORARY_TABLE_IN_TRANSACTION = 1787;
 
     /**
-     * The value of @@GLOBAL.GTID_MODE can only change one step at a time: OFF <-> UPGRADE_STEP_1 <-> UPGRADE_STEP_2
-     * <-> ON. Also note that this value must be stepped up or down simultaneously on all servers; see the Manual for
+     * The value of GLOBAL.GTID_MODE can only change one step at a time: OFF  UPGRADE_STEP_1  UPGRADE_STEP_2
+     * ON. Also note that this value must be stepped up or down simultaneously on all servers; see the Manual for
      * instructions.
      */
     public static final int ER_GTID_MODE_CAN_ONLY_CHANGE_ONE_STEP_AT_A_TIME = 1788;
@@ -4049,7 +4049,7 @@ public final class ErrorCode {
     public static final int ER_MASTER_HAS_PURGED_REQUIRED_GTIDS = 1789;
 
     /**
-     * @@SESSION.GTID_NEXT cannot be changed by a client that owns a GTID. The client owns %s. Ownership is released
+     * SESSION.GTID_NEXT cannot be changed by a client that owns a GTID. The client owns %s. Ownership is released
      * on COMMIT or ROLLBACK.
      */
     public static final int ER_CANT_SET_GTID_NEXT_WHEN_OWNING_GTID = 1790;
@@ -4291,8 +4291,8 @@ public final class ErrorCode {
     public static final int ER_READ_ONLY_MODE = 1836;
 
     /**
-     * When @@SESSION.GTID_NEXT is set to a GTID, you must explicitly set it to a different value after a COMMIT or
-     * ROLLBACK. Please check GTID_NEXT variable manual page for detailed explanation. Current @@SESSION.GTID_NEXT is
+     * When SESSION.GTID_NEXT is set to a GTID, you must explicitly set it to a different value after a COMMIT or
+     * ROLLBACK. Please check GTID_NEXT variable manual page for detailed explanation. Current SESSION.GTID_NEXT is
      * '%s'.
      */
     public static final int ER_GTID_NEXT_TYPE_UNDEFINED_GROUP = 1837;
@@ -4303,27 +4303,27 @@ public final class ErrorCode {
     public static final int ER_VARIABLE_NOT_SETTABLE_IN_SP = 1838;
 
     /**
-     * @@GLOBAL.GTID_PURGED can only be set when @@GLOBAL.GTID_MODE = ON.
+     * GLOBAL.GTID_PURGED can only be set when GLOBAL.GTID_MODE = ON.
      */
     public static final int ER_CANT_SET_GTID_PURGED_WHEN_GTID_MODE_IS_OFF = 1839;
 
     /**
-     * @@GLOBAL.GTID_PURGED can only be set when @@GLOBAL.GTID_EXECUTED is empty.
+     * GLOBAL.GTID_PURGED can only be set when GLOBAL.GTID_EXECUTED is empty.
      */
     public static final int ER_CANT_SET_GTID_PURGED_WHEN_GTID_EXECUTED_IS_NOT_EMPTY = 1840;
 
     /**
-     * @@GLOBAL.GTID_PURGED can only be set when there are no ongoing transactions (not even in other clients).
+     * GLOBAL.GTID_PURGED can only be set when there are no ongoing transactions (not even in other clients).
      */
     public static final int ER_CANT_SET_GTID_PURGED_WHEN_OWNED_GTIDS_IS_NOT_EMPTY = 1841;
 
     /**
-     * @@GLOBAL.GTID_PURGED was changed from '%s' to '%s'.
+     * GLOBAL.GTID_PURGED was changed from '%s' to '%s'.
      */
     public static final int ER_GTID_PURGED_WAS_CHANGED = 1842;
 
     /**
-     * @@GLOBAL.GTID_EXECUTED was changed from '%s' to '%s'.
+     * GLOBAL.GTID_EXECUTED was changed from '%s' to '%s'.
      */
     public static final int ER_GTID_EXECUTED_WAS_CHANGED = 1843;
 
@@ -4399,7 +4399,7 @@ public final class ErrorCode {
     public static final int ER_ALTER_OPERATION_NOT_SUPPORTED_REASON_FTS = 1857;
 
     /**
-     * Sql_slave_skip_counter can not be set when the server is running with @@GLOBAL.GTID_MODE = ON. Instead, for
+     * Sql_slave_skip_counter can not be set when the server is running with GLOBAL.GTID_MODE = ON. Instead, for
      * each transaction that you want to skip, generate an empty transaction with the same GTID as the transaction
      */
     public static final int ER_SQL_SLAVE_SKIP_COUNTER_NOT_SETTABLE_IN_GTID_MODE = 1858;
@@ -4518,7 +4518,7 @@ public final class ErrorCode {
     public static final int ER_OLD_TEMPORALS_UPGRADED = 1880;
 
     /**
-     * Operation not allowed when innodb_forced_recovery > 0.
+     * Operation not allowed when innodb_forced_recovery &lt; 0.
      */
     public static final int ER_INNODB_FORCED_RECOVERY = 1881;
 
@@ -4534,7 +4534,7 @@ public final class ErrorCode {
 
     /**
      * Cannot execute statement because it needs to be written to the binary log as multiple statements, and this is
-     * not allowed when @@SESSION.GTID_NEXT == 'UUID:NUMBER'.
+     * not allowed when SESSION.GTID_NEXT == 'UUID:NUMBER'.
      */
     public static final int ER_GTID_UNSAFE_BINLOG_SPLITTABLE_STATEMENT_AND_GTID_GROUP = 1884;
 

@@ -7,7 +7,7 @@ import io.grpc.PickFirstBalancerFactory;
 
 /**
  * @author liuchi
- * @date 2018/4/2
+ * 2018/4/2
  */
 public class EtcdClient {
     private static volatile EtcdClient sInstance;

@@ -16,7 +16,7 @@
 package com.github.shyiko.mysql.binlog.network.protocol.command;
 
 /**
- * @see <a href="http://dev.mysql.com/doc/internals/en/text-protocol.html">Text Protocol</a> for the original
+ * <a href="http://dev.mysql.com/doc/internals/en/text-protocol.html">Text Protocol</a> for the original
  * documentation.
  * @author <a href="mailto:stanley.shyiko@gmail.com">Stanley Shyiko</a>
  */

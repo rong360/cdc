@@ -39,6 +39,9 @@ public class ByteArrayInputStream extends InputStream {
 
     /**
      * Read int written in little-endian format.
+     * @throws IOException exc
+     * @return int
+     * @param length length
      */
     public int readInteger(int length) throws IOException {
         int result = 0;
@@ -50,6 +53,9 @@ public class ByteArrayInputStream extends InputStream {
 
     /**
      * Read long written in little-endian format.
+     * @throws IOException exc
+     * @return long
+     * @param length length
      */
     public long readLong(int length) throws IOException {
         long result = 0;
@@ -61,6 +67,9 @@ public class ByteArrayInputStream extends InputStream {
 
     /**
      * Read fixed length string.
+     * @throws IOException exc
+     * @return string
+     * @param length length
      */
     public String readString(int length) throws IOException {
         return new String(read(length));
@@ -68,6 +77,8 @@ public class ByteArrayInputStream extends InputStream {
 
     /**
      * Read variable-length string. Preceding packed integer indicates the length of the string.
+     * @throws IOException exc
+     * @return string
      */
     public String readLengthEncodedString() throws IOException {
         return readString(readPackedInteger());
@@ -75,6 +86,8 @@ public class ByteArrayInputStream extends InputStream {
 
     /**
      * Read variable-length string. End is indicated by 0x00 byte.
+     * @throws IOException exc
+     * @return string
      */
     public String readZeroTerminatedString() throws IOException {
         ByteArrayOutputStream s = new ByteArrayOutputStream();
@@ -126,6 +139,8 @@ public class ByteArrayInputStream extends InputStream {
 
     /**
      * @see #readPackedNumber()
+     * @throws IOException exc
+     * @return int
      */
     public int readPackedInteger() throws IOException {
         Number number = readPackedNumber();
@@ -139,12 +154,14 @@ public class ByteArrayInputStream extends InputStream {
     }
 
     /**
-     * Format (first-byte-based):<br/>
-     * 0-250 - The first byte is the number (in the range 0-250). No additional bytes are used.<br/>
-     * 251 - SQL NULL value<br/>
-     * 252 - Two more bytes are used. The number is in the range 251-0xffff.<br/>
-     * 253 - Three more bytes are used. The number is in the range 0xffff-0xffffff.<br/>
+     * Format (first-byte-based):
+     * 0-250 - The first byte is the number (in the range 0-250). No additional bytes are used.
+     * 251 - SQL NULL value
+     * 252 - Two more bytes are used. The number is in the range 251-0xffff.
+     * 253 - Three more bytes are used. The number is in the range 0xffff-0xffffff.
      * 254 - Eight more bytes are used. The number is in the range 0xffffff-0xffffffffffffffff.
+     * @throws IOException exc
+     * @return number
      */
     public Number readPackedNumber() throws IOException {
         int b = this.read();

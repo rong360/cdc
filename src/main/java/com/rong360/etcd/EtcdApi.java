@@ -2,18 +2,21 @@ package com.rong360.etcd;
 
 import com.coreos.jetcd.Lock;
 import com.coreos.jetcd.data.ByteSequence;
+import com.coreos.jetcd.data.KeyValue;
 import com.coreos.jetcd.kv.GetResponse;
+import com.coreos.jetcd.options.GetOption;
 import com.coreos.jetcd.options.PutOption;
 import com.rong360.binlogutil.RongUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 /**
  * @author liuchi
- * @date 2018/4/2
+ * 2018/4/2
  */
 public class EtcdApi {
     private final static Logger logger = LoggerFactory.getLogger(EtcdApi.class);
@@ -39,6 +42,20 @@ public class EtcdApi {
             logger.error("etcd get error key:{}", key, e);
         }
         return "";
+    }
+
+    public static List<KeyValue> getPrefix(String key) throws Exception {
+        GetResponse getResponse = EtcdClient.getInstance().getKVClient().get(
+                ByteSequence.fromString(key),
+                GetOption.newBuilder().withPrefix(ByteSequence.fromString(key)).
+                        withSortField(GetOption.SortTarget.KEY).build()
+        ).get();
+        List<KeyValue> list = getResponse.getKvs();
+        if (list.isEmpty()) {
+            // key does not exist
+            logger.info("[get key does not exist] {}", key);
+        }
+        return list;
     }
 
     public static void getLock(long leaseId) {

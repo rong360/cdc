@@ -121,6 +121,8 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 	/**
 	 * Alias for BinaryLogClient("localhost", 3306, &lt;no schema&gt; = null, username, password).
 	 * @see BinaryLogClient#BinaryLogClient(String, int, String, String, String)
+	 * @param password password
+	 * @param username username
 	 */
 	public BinaryLogClient(String username, String password) {
 		this("localhost", 3306, null, username, password);
@@ -129,6 +131,9 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 	/**
 	 * Alias for BinaryLogClient("localhost", 3306, schema, username, password).
 	 * @see BinaryLogClient#BinaryLogClient(String, int, String, String, String)
+	 * @param password password
+	 * @param schema schema
+	 * @param username username
 	 */
 	public BinaryLogClient(String schema, String username, String password) {
 		this("localhost", 3306, schema, username, password);
@@ -137,6 +142,10 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 	/**
 	 * Alias for BinaryLogClient(hostname, port, &lt;no schema&gt; = null, username, password).
 	 * @see BinaryLogClient#BinaryLogClient(String, int, String, String, String)
+	 * @param username username
+	 * @param password password
+	 * @param port port
+	 * @param hostname hostname
 	 */
 	public BinaryLogClient(String hostname, int port, String username, String password) {
 		this(hostname, port, null, username, password);
@@ -520,6 +529,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 							setMainThreadFinish(true);
 							setKeepAlive(false);
 							keepAliveThreadExecutor.shutdown();
+							System.exit(1);
 							return;
 						}
 					}
@@ -683,7 +693,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 				}
 			}
 		} catch (Exception e) {
-			logger.warn("Get event failed:" + e.getMessage());
+			logger.warn("Get event failed:" + e.getMessage(),e);
 			if (isConnected()) {
 				synchronized (lifecycleListeners) {
 					for (LifecycleListener lifecycleListener : lifecycleListeners) {
@@ -802,6 +812,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 	/**
 	 * Register event listener. Note that multiple event listeners will be called in order they
 	 * where registered.
+	 * @param eventListener eventListener
 	 */
 	public void registerEventListener(EventListener eventListener) {
 		synchronized (eventListeners) {
@@ -811,6 +822,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 
 	/**
 	 * Unregister all event listener of specific type.
+	 * @param listenerClass listenerClass
 	 */
 	public void unregisterEventListener(Class<? extends EventListener> listenerClass) {
 		synchronized (eventListeners) {
@@ -826,6 +838,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 
 	/**
 	 * Unregister single event listener.
+	 * @param eventListener eventListener
 	 */
 	public void unregisterEventListener(EventListener eventListener) {
 		synchronized (eventListeners) {
@@ -836,6 +849,9 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 	private void notifyEventListeners(Event event) {
 		if (event.getData() instanceof EventDeserializer.EventDataWrapper) {
 			event = new Event(event.getHeader(), ((EventDeserializer.EventDataWrapper) event.getData()).getExternal());
+		}
+		if (event.getHeader() instanceof EventHeaderV4){
+			((EventHeaderV4) event.getHeader()).setBinlogFilename(this.binlogFilename);
 		}
 		synchronized (eventListeners) {
 			for (EventListener eventListener : eventListeners) {
@@ -858,6 +874,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 	/**
 	 * Register lifecycle listener. Note that multiple lifecycle listeners will be called in order they
 	 * where registered.
+	 * @param lifecycleListener lifecycleListener
 	 */
 	public void registerLifecycleListener(LifecycleListener lifecycleListener) {
 		synchronized (lifecycleListeners) {
@@ -867,6 +884,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 
 	/**
 	 * Unregister all lifecycle listener of specific type.
+	 * @param listenerClass listenerClass
 	 */
 	public synchronized void unregisterLifecycleListener(Class<? extends LifecycleListener> listenerClass) {
 		synchronized (lifecycleListeners) {
@@ -882,6 +900,7 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 
 	/**
 	 * Unregister single lifecycle listener.
+	 * @param eventListener eventListener
 	 */
 	public synchronized void unregisterLifecycleListener(LifecycleListener eventListener) {
 		synchronized (lifecycleListeners) {
@@ -953,23 +972,29 @@ public class BinaryLogClient implements BinaryLogClientMXBean {
 
 		/**
 		 * Called once client has successfully logged in but before started to receive binlog events.
+		 * @param client client
 		 */
 		void onConnect(BinaryLogClient client);
 
 		/**
 		 * It's guarantied to be called before {@link #onDisconnect(BinaryLogClient)}) in case of
 		 * communication failure.
+		 * @param client client
+		 * @param ex ex
 		 */
 		void onCommunicationFailure(BinaryLogClient client, Exception ex);
 
 		/**
 		 * Called in case of failed event deserialization. Note this type of error does NOT cause client to
 		 * disconnect. If you wish to stop receiving events you'll need to fire client.disconnect() manually.
+		 * @param client client
+		 * @param ex ex
 		 */
 		void onEventDeserializationFailure(BinaryLogClient client, Exception ex);
 
 		/**
 		 * Called upon disconnect (regardless of the reason).
+		 * @param client client
 		 */
 		void onDisconnect(BinaryLogClient client);
 	}

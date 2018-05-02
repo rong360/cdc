@@ -154,6 +154,9 @@ public class EventDeserializer {
 
 	/**
 	 * @return deserialized event or null in case of end-of-stream
+	 * @throws IOException exc
+	 * @param inputStream input
+	 * @return event
 	 */
 	public Event nextEvent(ByteArrayInputStream inputStream) throws IOException {
 		if (inputStream.peek() == -1) {

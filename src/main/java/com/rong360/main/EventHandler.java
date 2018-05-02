@@ -181,8 +181,12 @@ public class EventHandler extends Thread {
                             batchTime = nowTime;
                             if (dataList.size() == 0) {
                                 if (nextBinlogPosition > 0) {
+                                    String binlogFilename = this.client.getBinlogFilename();
+                                    if (trackableEventHeader.getBinlogFilename() != null) {
+                                        binlogFilename = trackableEventHeader.getBinlogFilename();
+                                    }
                                     ConcurrentHashMap<String, String> binlogPosMap = new ConcurrentHashMap<String, String>();
-                                    binlogPosMap.put("filename", this.client.getBinlogFilename());
+                                    binlogPosMap.put("filename", binlogFilename);
                                     binlogPosMap.put("filepos", String.valueOf(nextBinlogPosition));
                                     threadBinlogMap.put(this.threadName, binlogPosMap);
                                     binlogPosMap = null;

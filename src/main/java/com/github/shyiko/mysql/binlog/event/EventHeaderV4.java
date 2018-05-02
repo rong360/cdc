@@ -29,6 +29,8 @@ public class EventHeaderV4 implements EventHeader {
     // v3 (MySQL 4.0.2-4.1)
     private long nextPosition;
     private int flags;
+    private String binlogFilename;
+
 
     @Override
     public long getTimestamp() {
@@ -69,6 +71,10 @@ public class EventHeaderV4 implements EventHeader {
         return nextPosition - eventLength;
     }
 
+    public void setBinlogFilename(String binlogFilename) {
+        this.binlogFilename = binlogFilename;
+    }
+
     public long getNextPosition() {
         return nextPosition;
     }
@@ -93,6 +99,10 @@ public class EventHeaderV4 implements EventHeader {
     @Override
     public long getDataLength() {
         return getEventLength() - getHeaderLength();
+    }
+
+    public String getBinlogFilename() {
+        return binlogFilename;
     }
 
     @Override

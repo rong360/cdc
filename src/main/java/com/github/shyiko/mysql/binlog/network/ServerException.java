@@ -33,6 +33,7 @@ public class ServerException extends IOException {
 
     /**
      * @see ErrorCode
+     * @return error code
      */
     public int getErrorCode() {
         return errorCode;

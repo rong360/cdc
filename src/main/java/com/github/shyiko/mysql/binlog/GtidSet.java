@@ -25,7 +25,7 @@ import java.util.*;
  * gtid_set: uuid_set[,uuid_set]...
  * uuid_set: uuid:interval[:interval]...
  * uuid: hhhhhhhh-hhhh-hhhh-hhhh-hhhhhhhhhhhh, h: [0-9|A-F]
- * interval: n[-n], (n >= 1)
+ * interval: n[-n], (n &gt;= 1)
  * </pre>
  *
  * @author <a href="mailto:stanley.shyiko@gmail.com">Stanley Shyiko</a>
