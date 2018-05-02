@@ -3,15 +3,15 @@
 
 mysql binlog parser json into rabbitmq or others(such as kafka)
 ## What is cdc?
-change data capture, Key Features
+change data capture, Key Features:
 - High availability, cluster deployment
-Table level filter binlog file
-Supports all mysql field parsing
-Automatically save the binlog location node, smooth upgrade and restart, data is not lost
-Configure centralized management
-Operational status monitoring
-Dynamically loading table configuration files
-Support for adding multiple exported data sources for easy expansion to kafka or other
+- Table level filter binlog file
+- Supports all mysql field parsing
+- Automatically save the binlog location node, smooth upgrade and restart, data is not lost
+- Configure centralized management
+- Operational status monitoring
+- Dynamically loading table configuration files
+- Support for adding multiple exported data sources for easy expansion to kafka or other
 ## Java Versions
 
 Java 8 or above is required.
