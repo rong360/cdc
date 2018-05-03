@@ -177,7 +177,7 @@ includes:
 
 -   Database table configuration, reconnection timeout, retries
 
-Since etcd is a kv structure, the key rules mapped to etcd are as follows:
+Since etcd is a key-value structure, the key rules mapped to etcd are as follows:
 
 Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 
@@ -230,8 +230,10 @@ will also be stored via etcd, including:
 
 Currently supports dynamically adding tables and deleting table configurations,
 such as adding tables to etcd, adding the corresponding key
-value:cdc/master/admin/config/cdc/filter/admin/right 1.
-
+value:
+```bash
+etcdctl put cdc/master/admin/config/cdc/filter/admin/right 1.
+```
 The helper-thread2 watch this key to achieve dynamic loading configuration.
 
 > Note: databases and other configuration information are not support to
