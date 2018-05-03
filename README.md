@@ -8,7 +8,7 @@ change data capture, Key Features:
 - High availability, cluster deployment
 - Table level filter binlog file
 - Supports all mysql field parsing
-- Automatically save the binlog location node, smooth upgrade and restart, data is not lost
+- Automatically save the binlog location node, smooth upgrade and restart, data can not lost
 - Configure centralized management
 - Operational status monitoring
 - Dynamically loading table configuration files
