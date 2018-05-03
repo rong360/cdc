@@ -201,7 +201,7 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 | cdc/master/admin/config/cdc/filter/admin/orders_{suffix}  | 1                 | Optional     | Non-sequential delivery table, admin.orders_{suffix } tableconfiguration, where value is fixed to 1                                                               |
 ##### Filtering rule
 The table filtering key basic rule is:
-- Sequentially sent: cdc/cluster/instance/config/cdc/filter/database name/table
+- Sequentially: cdc/cluster/instance/config/cdc/filter/database name/table
 name
 - Non-sequential sending: cdc/cluster/instance/config/cdc/seqfilter/database name/table name
 
@@ -232,7 +232,7 @@ Currently supports dynamically adding tables and deleting table configurations,
 such as adding tables to etcd, adding the corresponding key
 value:
 ```bash
-etcdctl put cdc/master/admin/config/cdc/filter/admin/right 1.
+etcdctl put cdc/master/admin/config/cdc/filter/admin/right 1
 ```
 The helper-thread2 watch this key to achieve dynamic loading configuration.
 
@@ -249,7 +249,7 @@ receiver. Can support multiple message receivers.
 
 #### Rabbitmq message sent
 
-The CDC will send the message to a [TOPIC-type](http://www.rabbitmq.com/tutorials/tutorial-five-python.html) exchange in rabbitmq.
+The CDC will send the message to a [TOPIC-type](http://www.rabbitmq.com/tutorials/tutorial-five-java.html) exchange in rabbitmq.
 
 According to the corresponding routing key of the message, it is very convenient to send the message to the specified queue. Currently CDC's routingkey generation rules: 
 
@@ -351,7 +351,8 @@ Time-related will be converted into a timestamp
 |------------|--------------------------------------------------------------------------------------------------------------------------------|
 | database   | database name                                                                                                                  |
 | createtime | Time for generating this message                                                                                               |
-| data       | before:The fields and values before the update, are generally primary keys or UK after:Updated fields and corresponding values |
+| data       | before:The fields and values before the update, are generally primary keys or UK 
+after:Updated fields and corresponding values |
 | action     | The operation type of this data                                                                                                |
 | uniqid     | message of md5(except createtime)                                                                                              |
 | table      | table name                                                                                                                     |
