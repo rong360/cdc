@@ -324,7 +324,7 @@ Time-related will be converted into a timestamp
         "varchar":"test varchar",
         "tinyint":"7",
         "multilinestring":"LINESTRING (0 0, 13 16)",
-        "int":"6",
+        "id":"6",
         "enum":"a",
         "mediumblob":"test mediumblob",
         "varbinary":"convert(binary,'8280')",
@@ -362,7 +362,7 @@ Time-related will be converted into a timestamp
     "createtime":1525319725963,
     "data":{
         "before":{
-            "int":"6"
+            "id":"6"
         },
         "after":{
             "mediumint":"3",
@@ -392,7 +392,7 @@ Time-related will be converted into a timestamp
     "database":"test",
     "createtime":1525319817439,
     "data":{
-        "int":"6"
+        "id":"6"
     },
     "action":"delete",
     "uniqid":"9f0460b56a10fe87713093d13c2b7226",
@@ -403,7 +403,7 @@ Time-related will be converted into a timestamp
 The table structure in this example is as follows
 ```sql
 CREATE TABLE `cdctest` (
-  `int` int(11) NOT NULL AUTO_INCREMENT,
+  `id` int(11) NOT NULL AUTO_INCREMENT,
   `tinyint` tinyint(4) DEFAULT NULL,
   `smallint` smallint(6) DEFAULT NULL,
   `mediumint` mediumint(9) DEFAULT NULL,
