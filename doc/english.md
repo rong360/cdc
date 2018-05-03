@@ -99,8 +99,8 @@ through etcd:
 #### Service registration
 
 After the instance is started, a unique key is registered in etcd (the design
-principle of key is described in detail in the [configuration management](#jump)
-section). The key lifetime is 60 seconds. Refresh the ttl every 5s by turning on
+principle of key is described in detail in the [configuration
+management](#configuration-management) section). The key lifetime is 60 seconds. Refresh the ttl every 5s by turning on
 the thread (helper-thread3) and keep heartbeat with etcd.
 
 The main purpose of service registration is to monitor the status of the
@@ -154,7 +154,7 @@ that position.
 
 > Note: There will be repeated messages when the program restarts
 
-#### <span id = "jump">Configuration management</span>
+#### Configuration management
 
 Unified management configuration through etcd. The configuration here mainly
 includes:
