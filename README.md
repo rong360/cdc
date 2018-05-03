@@ -1,4 +1,5 @@
 # cdc
+[![Build Status](https://www.travis-ci.org/rong360/cdc.svg?branch=master)](https://www.travis-ci.org/rong360/cdc)
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
 mysql binlog parser json into rabbitmq or others(such as kafka)
