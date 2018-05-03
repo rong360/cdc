@@ -351,8 +351,7 @@ Time-related will be converted into a timestamp
 |------------|--------------------------------------------------------------------------------------------------------------------------------|
 | database   | database name                                                                                                                  |
 | createtime | Time for generating this message                                                                                               |
-| data       | before:The fields and values before the update, are generally primary keys or UK 
-after:Updated fields and corresponding values |
+| data       | before:The fields and values before the update, are generally primary keys or UK <br />after:Updated fields and corresponding values |
 | action     | The operation type of this data                                                                                                |
 | uniqid     | message of md5(except createtime)                                                                                              |
 | table      | table name                                                                                                                     |
