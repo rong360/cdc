@@ -1,9 +1,17 @@
 # cdc
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 
-mysql binlog parser json into rabbitmq or others, such as kafka
+mysql binlog parser json into rabbitmq or others(such as kafka)
 ## What is cdc?
-change data capture
+change data capture, Key Features:
+- High availability, cluster deployment
+- Table level filter binlog file
+- Supports all mysql field parsing
+- Automatically save the binlog location node, smooth upgrade and restart, data is not lost
+- Configure centralized management
+- Operational status monitoring
+- Dynamically loading table configuration files
+- Support for adding multiple exported data sources for easy expansion to kafka or other
 ## Java Versions
 
 Java 8 or above is required.
@@ -19,22 +27,20 @@ Java 8 or above is required.
 </dependency>
 ```
 ## Quick start
-*install etcd[https://coreos.com/etcd/docs/latest/dl_build.html], start etcd
+* install [etcd](https://coreos.com/etcd/docs/latest/dl_build.html), start etcd
 ```bash
 $ ./bin/etcd
 ```
-*enable auth[https://github.com/coreos/etcd/tree/master/etcdctl#output-26]
-
-*Set the database configuration in etcd
+* Set the database configuration in etcd
 ```config
-cdc/master/admin/config/app/mysql/host 10.0.0.2
-cdc/master/admin/config/app/mysql/port 3306
-cdc/master/admin/config/app/mysql/username admin
-cdc/master/admin/config/app/mysql/password 123
+etcdctl put cdc/master/admin/config/app/mysql/host 10.0.0.2
+etcdctl put cdc/master/admin/config/app/mysql/port 3306
+etcdctl put cdc/master/admin/config/app/mysql/username admin
+etcdctl put cdc/master/admin/config/app/mysql/password 123
 ```
-*Start program
+* Start program
 ```java
-CdcClient client = new CdcClient(etcdHost, etcdUsername, etcdPassword);
+CdcClient client = new CdcClient("http://127.0.0.1:2379", "", "");
 client.setInstance("admin");
 client.setWatchAllTable(true);
 client.start();
