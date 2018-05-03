@@ -44,7 +44,7 @@ Design implementation
 | [tungsten-queue-applier](https://github.com/tailorcai/tungsten-queue-applier)         | Java                    | Pass, unmaintained                                                                              |
 
 Binlog dump, we use the open source
-program [php-mysql-replication](https://github.com/krowinski/php-mysql-replication)
+program [mysql-binlog-connector-java](https://github.com/shyiko/mysql-binlog-connector-java) 
 
 ### Overall structure 
 
