@@ -17,7 +17,7 @@ Features
 
 -   Supports all mysql field parsing
 
--   Automatically save the binlog location node, smooth upgrade and restart,
+-   Automatically save the binlog position, smooth upgrade and restart,
     data is not lost
 
 -   Configure centralized management
@@ -130,7 +130,7 @@ clustering was introduced to be compatible with such scenarios: 2 instances are
 open at the same time to listen to the same slave (not recommended). The default
 cluster is master
 
-#### Save binlog name and location node
+#### Save binlog file name and position
 
 The helper thread (helper-thread1) synchronizes the binlog name and position of
 the most recent successful message and saves it to etcd at a frequency of 5
@@ -148,7 +148,7 @@ For example, the five sending thread positions are:
 
 >   fileName=mysql-bin.000003,pos=36648
 
-The final saved is mysql-bin.000003,36648. The next time you start the instance,
+The final saved is mysql-bin.000003, 36648. The next time you start the instance,
 it reads the position from etcd and continues to parse the binlog event from
 that position.
 
@@ -191,8 +191,8 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 | cdc/master/admin/config/app/rabbitmq/port                 | 4567              | Optional     | Rabbitmq cluster port (only support cluster port is the same when multiple clusters are configured )                                                              |
 | cdc/master/admin/config/app/rabbitmq/username             | Admin             | Optional     | Rabbitmq cluster username                                                                                                                                         |
 | cdc/master/admin/config/app/rabbitmq/password             | 123               | Optional     | Rabbitmq cluster password                                                                                                                                         |
-| cdc/master/admin/config/app/rabbitmq/vhost                | Core              | Optional     | Rabbitmq cluster Virtual host                                                                                                                                     |
-| cdc/master/admin/config/app/rabbitmq/exchangename         | Cdc               | Optional     | Rabbitmq cluster exchange name                                                                                                                                    |
+| cdc/master/admin/config/app/rabbitmq/vhost                | core              | Optional     | Rabbitmq cluster Virtual host                                                                                                                                     |
+| cdc/master/admin/config/app/rabbitmq/exchangename         | cdc               | Optional     | Rabbitmq cluster exchange name                                                                                                                                    |
 | cdc/master/admin/config/cdc/connection_timedout_inseconds | 10                | no           | Cdc and mysql connection timeout (default 10s)                                                                                                                    |
 | cdc/master/admin/config/cdc/ping_failed_max_retry         | 50                | no           | Cdc and mysql retry connections                                                                                                                                   |
 | cdc/master/admin/config/cdc/mysqlTimeZone                 | GMT+8             | no           | We will convert the datatime to a timestamp and add the mysql time zone ( time zone abbreviation such as CST is not allowed . There will be time zone confusion ) |
@@ -249,20 +249,18 @@ receiver. Can support multiple message receivers.
 
 #### Rabbitmq message sent
 
-The CDC will send the message to a TOPIC-type exchange in rabbitmq. Visible
-documentation:[Rabbitmq TOPIC
-Introduction](https://translate.google.com/translate?hl=zh-CN&prev=_t&sl=zh-CN&tl=en&u=http://www.rabbitmq.com/tutorials/tutorial-five-python.html)
+The CDC will send the message to a [TOPIC-type](http://www.rabbitmq.com/tutorials/tutorial-five-python.html) exchange in rabbitmq.
 
-According to the corresponding routing key of the message, it is very convenient
-to send the message to the specified queue. Currently CDC's routingkey
-generation rules are: Database(database name).table(table
-name).action(corresponding action, insert/update/delete)
+According to the corresponding routing key of the message, it is very convenient to send the message to the specified queue. Currently CDC's routingkey generation rules: 
+
+* database(database name).table(table name).action(corresponding action, insert/update/delete)
 
 If it is a sharding table, in order to avoid adding multiple bindings in
-rabbitmq. The routingkey generation rule is: database(database
-name).{table(table name prefix)}.action(corresponding action,
-insert/update/delete). For example, if the orders are orders_1 and orders_2, the
-corresponding routingkey is admin.{orders_}.\*
+rabbitmq. The routingkey generation rules:
+
+* database(database name).{table(table name prefix)}.action(corresponding action, insert/update/delete)
+
+For example, if the orders's sharding are orders_1 and orders_2, the corresponding routingkey is admin.{orders_}.\*
 
 The steps to set up an enqueuing rule are basically as follows:
 
@@ -284,7 +282,7 @@ client.registerMessageListener(new RabbitMessageListener());
 
 In order to be compatible with different message receivers, the binlog event is
 uniformly converted to a JSON string. For the binlog_row_image format is full or
-minimal, but the update data contains all the fields, the basic structure is
+minimal, but the full binlog_row_image's update data contains all the fields, the basic structure is
 consistent
 
 Time-related will be converted into a timestamp
