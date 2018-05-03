@@ -47,7 +47,9 @@ client.start();
 ```
 ## Documentation
 ### English
+See [DOUCUMENT](https://github.com/rong360/cdc/blob/master/doc/english.md) for details.
 ### 简体中文
 ## Architecture
 ## Connect with us
+<liuchi@rong360.com>
 ### Q&A
