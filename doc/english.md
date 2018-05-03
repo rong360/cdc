@@ -199,18 +199,18 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 | cdc/master/admin/config/cdc/seqfilter/admin/user          | 1                 | Optional     | Send the table in order, admin.user configuration, where the value is fixed to 1                                                                                  |
 | cdc/master/admin/config/cdc/filter/admin/role             | 1                 | Optional     | Non-sequential sending table, admin. roleconfiguration, where value is fixed to 1                                                                                 |
 | cdc/master/admin/config/cdc/filter/admin/orders_{suffix}  | 1                 | Optional     | Non-sequential delivery table, admin.orders_{suffix } tableconfiguration, where value is fixed to 1                                                               |
-##### filtering rule
+##### Filtering rule
 The table filtering key basic rule is:
 - Sequentially sent: cdc/cluster/instance/config/cdc/filter/database name/table
 name
 - Non-sequential sending: cdc/cluster/instance/config/cdc/seqfilter/database name/table name
 
 > Note: Table filtering configuration requires at least one, if this feature is enabled.
-
-Description: sharding. For example, if you do a sharding for table orders, you
+##### Sharding
+For example, if you do a sharding for table orders, you
 can capture the changes as long as they satisfy the orders\_ prefix table. Note
 that the "{suffix}" is a fixed value and cannot be changed.
-##### stop table filtering
+##### Stop table filtering
 ```java
 client.setWatchAllTable(true);
 ```
@@ -272,6 +272,11 @@ The steps to set up an enqueuing rule are basically as follows:
  
 
 ![C:\\3eac33f77ea9f1fcbcae3113779d93d1](media/f63ae49bd3cac52edaf4449b9f52c7d7.tmp)
+
+Register rabbitmq message listener
+```java
+client.registerMessageListener(new RabbitMessageListener());
+```
 
 ### Message
 
