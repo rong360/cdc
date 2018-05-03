@@ -13,9 +13,11 @@ change data capture, Key Features:
 - Operational status monitoring
 - Dynamically loading table configuration files
 - Support for adding multiple exported data sources for easy expansion to kafka or other
-## Java Versions
+## software Versions
 
-Java 8 or above is required.
+- Java 8 or above is required.
+- etcd 3.0 or above is required.
+- mysql 5.6+
 
 ## Download
 
