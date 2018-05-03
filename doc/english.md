@@ -208,8 +208,8 @@ name
 > Note: Table filtering configuration requires at least one, if this feature is enabled.
 ##### Sharding
 For example, if you do a sharding for table orders, you
-can capture the changes as long as they satisfy the orders\_ prefix table. Note
-that the "{suffix}" is a fixed value and cannot be changed.
+can capture the changes as long as they satisfy the orders\_ prefix table. 
+> Note: the "{suffix}" is a fixed value and cannot be changed.
 ##### Stop table filtering
 ```java
 client.setWatchAllTable(true);
@@ -234,7 +234,7 @@ value:cdc/master/admin/config/cdc/filter/admin/right 1.
 
 The helper-thread2 watch this key to achieve dynamic loading configuration.
 
-Note that databases and other configuration information are not support to
+> Note: databases and other configuration information are not support to
 dynamically loaded.
 
 ### Message receiver
@@ -285,8 +285,8 @@ uniformly converted to a JSON string. For the binlog_row_image format is full o
 minimal, but the update data contains all the fields, the basic structure is
 consistent
 
-Time-related will be converted into a timestamp, note that the time field is
-relative to 0 :00:00:00, 01/01/1970 GMT
+Time-related will be converted into a timestamp
+> Note: that the time field is relative to 00:00:00, 01/01/1970 GMT
 
 #### INSERT
 
