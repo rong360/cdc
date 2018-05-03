@@ -51,5 +51,6 @@ See [DOUCUMENT](https://github.com/rong360/cdc/blob/master/doc/english.md) for d
 ### 简体中文
 ## Architecture
 ## Connect with us
+<zhangtao@rong360.com>
 <liuchi@rong360.com>
 ### Q&A
