@@ -154,7 +154,7 @@ that position.
 
 Note: There will be repeated messages when the program restarts
 
-#### Configuration management<span id = "jump">跳转到的位置</span>
+#### <span id = "jump">Configuration management</span>
 
 Unified management configuration through etcd. The configuration here mainly
 includes:
@@ -193,7 +193,8 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 | cdc/master/instance_admin/config/app/rabbitmq/password             | 123               | Optional     | Rabbitmq cluster password                                                                                                                                         |
 | cdc/master/instance_admin/config/app/rabbitmq/vhost                | Core              | Optional     | Rabbitmq cluster Virtual host                                                                                                                                     |
 | cdc/master/instance_admin/config/app/rabbitmq/exchangename         | Cdc               | Optional     | Rabbitmq cluster exchange name                                                                                                                                    |
-| cdc/master/instance_admin/config/cdc/connection_timedout_inseconds | 10                | no           | Cdc and mysql connection timeout (default 10s)                                                                                                                    |
+| cdc/master/instance_admin/config/cdc/connection_timedout_
+inseconds | 10                | no           | Cdc and mysql connection timeout (default 10s)                                                                                                                    |
 | cdc/master/instance_admin/config/cdc/ping_failed_max_retry         | 50                | no           | Cdc and mysql retry connections                                                                                                                                   |
 | cdc/master/instance_admin/config/cdc/mysqlTimeZone                 | GMT+8             | no           | We will convert the datatime to a timestamp and add the mysql time zone ( time zone abbreviation such as CST is not allowed . There will be time zone confusion ) |
 | cdc/master/instance_admin/config/cdc/seqfilter/admin/user          | 1                 | Optional     | Send the table in order, admin.user configuration, where the value is fixed to 1                                                                                  |
