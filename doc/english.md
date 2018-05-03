@@ -193,20 +193,19 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 | cdc/master/admin/config/app/rabbitmq/password             | 123               | Optional     | Rabbitmq cluster password                                                                                                                                         |
 | cdc/master/admin/config/app/rabbitmq/vhost                | Core              | Optional     | Rabbitmq cluster Virtual host                                                                                                                                     |
 | cdc/master/admin/config/app/rabbitmq/exchangename         | Cdc               | Optional     | Rabbitmq cluster exchange name                                                                                                                                    |
-| cdc/master/admin/config/cdc/connection_timedout_inseconds| 10                | no           | Cdc and mysql connection timeout (default 10s)                                                                                                                    |
+| cdc/master/admin/config/cdc/connection_timedout_inseconds | 10                | no           | Cdc and mysql connection timeout (default 10s)                                                                                                                    |
 | cdc/master/admin/config/cdc/ping_failed_max_retry         | 50                | no           | Cdc and mysql retry connections                                                                                                                                   |
 | cdc/master/admin/config/cdc/mysqlTimeZone                 | GMT+8             | no           | We will convert the datatime to a timestamp and add the mysql time zone ( time zone abbreviation such as CST is not allowed . There will be time zone confusion ) |
 | cdc/master/admin/config/cdc/seqfilter/admin/user          | 1                 | Optional     | Send the table in order, admin.user configuration, where the value is fixed to 1                                                                                  |
 | cdc/master/admin/config/cdc/filter/admin/role             | 1                 | Optional     | Non-sequential sending table, admin. roleconfiguration, where value is fixed to 1                                                                                 |
 | cdc/master/admin/config/cdc/filter/admin/orders_{suffix}  | 1                 | Optional     | Non-sequential delivery table, admin.orders_{suffix } tableconfiguration, where value is fixed to 1                                                               |
 
-Sequentially sent: cdc/cluster/instance/config/cdc/filter/database name/table
-name, The table filtering key basic rule here is:
+The table filtering key basic rule here is:
+- Sequentially sent: cdc/cluster/instance/config/cdc/filter/database name/table
+name
+- Non-sequential sending: cdc/cluster/instance/config/cdc/seqfilter/database name/table name
 
-Non-sequential sending:
-cdc/cluster/instance/config/cdc/seqfilter/database name/table name
-
-Table filtering configuration requires at least one.
+> Note: Table filtering configuration requires at least one, if this feature is enabled.
 
 Description: sharding. For example, if you do a sharding for table orders, you
 can capture the changes as long as they satisfy the orders\_ prefix table. Note
