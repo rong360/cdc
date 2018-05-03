@@ -181,11 +181,11 @@ Since etcd is a key-value structure, the key rules mapped to etcd are as follows
 
 Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 
-| **Key**                                                            | **Value**         | **Required** | **meaning**                                                                                                                                                       |
-|--------------------------------------------------------------------|-------------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Key**                                                   | **Value**         | **Required** | **meaning**                                                                                                                                                       |
+|-----------------------------------------------------------|-------------------|--------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | cdc/master/admin/config/app/mysql/host                    | 10.0.0.1          | Yes          | Database host ip                                                                                                                                                  |
 | cdc/master/admin/config/app/mysql/port                    | 3300              | Yes          | Database port                                                                                                                                                     |
-| cdc/master/admin/config/app/mysql/username                | Admin             | Yes          | Database username                                                                                                                                                 |
+| cdc/master/admin/config/app/mysql/usernameadmin           | admin             | Yes          | Database username                                                                                                                                                 |
 | cdc/master/admin/config/app/mysql/password                | 123               | Yes          | Database password                                                                                                                                                 |
 | cdc/master/admin/config/app/rabbitmq/host                 | 10.0.0.1,10.0.0.2 | Optional     | Rabbitmqcluster host ip (comma separated) if you use rabbitmq required                                                                                            |
 | cdc/master/admin/config/app/rabbitmq/port                 | 4567              | Optional     | Rabbitmq cluster port (only support cluster port is the same when multiple clusters are configured )                                                              |
@@ -199,6 +199,7 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 | cdc/master/admin/config/cdc/seqfilter/admin/user          | 1                 | Optional     | Send the table in order, admin.user configuration, where the value is fixed to 1                                                                                  |
 | cdc/master/admin/config/cdc/filter/admin/role             | 1                 | Optional     | Non-sequential sending table, admin. roleconfiguration, where value is fixed to 1                                                                                 |
 | cdc/master/admin/config/cdc/filter/admin/orders_{suffix}  | 1                 | Optional     | Non-sequential delivery table, admin.orders_{suffix } tableconfiguration, where value is fixed to 1                                                               |
+
 ##### Filtering rule
 The table filtering key basic rule is:
 - Sequentially: cdc/cluster/instance/config/cdc/filter/database name/table
