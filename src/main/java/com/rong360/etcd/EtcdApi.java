@@ -28,7 +28,7 @@ public class EtcdApi {
                     ByteSequence.fromString(key),
                     ByteSequence.fromString(value)).get(timeOut, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            logger.error("etcd set error key:{},value{}", key, value, e);
+            logger.error("etcd set error key:{},value:{}", key, value, e);
         }
     }
 

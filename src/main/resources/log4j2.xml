@@ -2,28 +2,29 @@
 <Configuration status="WARN">
 	<properties>
 		<property name="LOG_HOME">default</property>
-		<property name="LOG_Layout">[%d{HH:mm:ss:SSS}] [%t] %c{1}:%L - %m%n</property>
+		<property name="LOG_Layout">[%d{yyyy-MM-dd HH:mm:ss:SSS}] [%p] [%t] %c{1}:%L - %m%n</property>
 	</properties>
 	<Appenders>
 		<Console name="Console" target="SYSTEM_OUT">
-			<PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n" />
+			<PatternLayout pattern="${sys:LOG_Layout}" />
 		</Console>
 
 		<RollingFile name="RollingFileInfo"
-			fileName="${sys:LOG_HOME}/application.log" filePattern="${sys:LOG_HOME}/application.log-%d{yyyy-MM-dd}" createOnDemand="true">
-			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
-			<ThresholdFilter level="info" onMatch="ACCEPT"
-				onMismatch="DENY" />
+			fileName="${sys:LOG_HOME}/info.log" filePattern="${sys:LOG_HOME}/info.log.%d{yyyy-MM-dd}-%i" createOnDemand="true">
+			<Filters>
+				<ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+				<ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+			</Filters>
 			<PatternLayout pattern="${sys:LOG_Layout}" />
 			<Policies>
 				<TimeBasedTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="1000 MB" />
 			</Policies>
+			<DefaultRolloverStrategy max="100"/>
 		</RollingFile>
 
 		<RollingFile name="RollingFileError"
-			fileName="${sys:LOG_HOME}/application.log.wf" filePattern="${sys:LOG_HOME}/application.log.wf-%d{yyyy-MM-dd}" createOnDemand="true">
-			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
+			fileName="${sys:LOG_HOME}/error.log" filePattern="${sys:LOG_HOME}/error.log.%d{yyyy-MM-dd}-%i" createOnDemand="true">
 			<ThresholdFilter level="warn" onMatch="ACCEPT"
 				onMismatch="DENY" />
 			<PatternLayout pattern="${sys:LOG_Layout}" />
@@ -31,11 +32,11 @@
 				<TimeBasedTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="1000 MB" />
 			</Policies>
+			<DefaultRolloverStrategy max="100"/>
 		</RollingFile>
 
 		<RollingFile name="RollingQueueFileInfo"
-					 fileName="${sys:LOG_HOME}/queue.log" filePattern="${sys:LOG_HOME}/queue.log-%d{yyyy-MM-dd}" createOnDemand="true">
-			<!--控制台只输出level及以上级别的信息（onMatch），其他的直接拒绝（onMismatch） -->
+					 fileName="${sys:LOG_HOME}/queue.log" filePattern="${sys:LOG_HOME}/queue.log.%d{yyyy-MM-dd}-%i" createOnDemand="true">
 			<ThresholdFilter level="info" onMatch="ACCEPT"
 							 onMismatch="DENY" />
 			<PatternLayout pattern="${sys:LOG_Layout}" />
@@ -43,6 +44,7 @@
 				<TimeBasedTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="1000 MB" />
 			</Policies>
+			<DefaultRolloverStrategy max="100"/>
 		</RollingFile>
 	</Appenders>
 	<Loggers>
