@@ -1,7 +1,7 @@
 # cdc
-[![Build Status](https://www.travis-ci.org/rong360/cdc.svg?branch=master)](https://www.travis-ci.org/rong360/cdc)
-[![License](https://img.shields.io/badge/Licence-Apache%202.0-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.html)
-[![Maven Central](https://img.shields.io/maven-central/v/com.rong360/cdc.svg)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.rong360%22%20AND%20a%3A%22cdc%22)
+[![Build Status](https://www.travis-ci.org/rong360/cdc.svg?branch=master&style=flat-square)](https://www.travis-ci.org/rong360/cdc)
+[![License](https://img.shields.io/badge/Licence-Apache%202.0-orange.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
+[![Maven Central](https://img.shields.io/maven-central/v/com.rong360/cdc.svg?style=flat-square)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.rong360%22%20AND%20a%3A%22cdc%22)
 
 mysql binlog parser json into rabbitmq or others(such as kafka)
 ## What is cdc?
