@@ -10,7 +10,12 @@
     <packaging>jar</packaging>
 
     <name>cdc</name>
-    <url>http://maven.apache.org</url>
+    <url>https://github.com/rong360/cdc</url>
+    <description>Mysql binlog parser json into rabbitmq or others(such as kafka)</description>
+    <organization>
+        <name>Rong360</name>
+        <url>https://github.com/rong360</url>
+    </organization>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
