@@ -27,7 +27,7 @@ change data capture, Key Features:
 <dependency>
   <groupId>com.rong360</groupId>
   <artifactId>cdc</artifactId>
-  <version>1.0.0</version>
+  <version>1.0.1</version>
 </dependency>
 ```
 ## Quick start
