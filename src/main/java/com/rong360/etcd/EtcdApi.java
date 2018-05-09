@@ -65,7 +65,7 @@ public class EtcdApi {
                 Lock lockClient = EtcdClient.getInstance().getLockClient();
                 lockClient.lock(
                         ByteSequence.fromString(RongUtil.getLockKey()),
-                        leaseId).get(timeOut, TimeUnit.MILLISECONDS).getKey();
+                        leaseId).get().getKey();
                 logger.info("get distribute lock suc!!");
                 return;
             } catch (Exception e) {
