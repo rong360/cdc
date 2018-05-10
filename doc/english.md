@@ -4,21 +4,18 @@ CDC documentation
 Introduce
 ---------
 
-MYSQL BINLOGS TO JSON conversion tool. Through the dump mysql binlogs file, the
-parsed data is converted into a JSON format for data synchronization or data
-change monitoring
+MYSQL BINLOGS TO JSON conversion tool. Convert the binglog event into a JSON format for data synchronization or data change monitoring
 
 Features
 --------
 
 -   High availability, cluster deployment
 
--   Table level filter binlog file
+-   Table level filter
 
--   Supports all mysql field parsing
+-   Supports almost all mysql field parsing
 
--   Automatically save the binlog position, smooth upgrade and restart,
-    data is not lost
+-   Automatically save binlog position, smooth upgrade and restart
 
 -   Configure centralized management
 
@@ -26,25 +23,8 @@ Features
 
 -   Dynamically loading table configuration
 
--   Support for adding multiple exported data sources for easy expansion to
-    kafka or other
+-   Support a easy way to tap it into other mq (sucn as kafka,nsq,redis...)
 
-Design implementation
----------------------
-
-### Binlog dump technical solution selection
-
-| Repo                                                                                  | Implementation language | Instructions                                                                                    |
-|---------------------------------------------------------------------------------------|-------------------------|-------------------------------------------------------------------------------------------------|
-| [python-mysql-replication](https://github.com/noplay/python-mysql-replicationication) | Python                  | Pass, not familiar with python                                                                  |
-| [php-mysql-replication](https://github.com/krowinski/php-mysql-replication)           | PHP                     | Pass, lack of high availability, multithreading                                                 |
-| [mysql-binlog-connector-java](https://github.com/shyiko/mysql-binlog-connector-java)  | Java                    | Choosed, pure java development, does not rely on third-party jar packages, features lightweight |
-| [canal](https://github.com/alibaba/canal)                                             | Java                    | Pass, Ali's open source solution, heavyweight, local stable reproduction bug                    |
-| [go-mysql](https://github.com/siddontang/go-mysql)                                    | Go                      | Pass, not familiar with go                                                                      |
-| [tungsten-queue-applier](https://github.com/tailorcai/tungsten-queue-applier)         | Java                    | Pass, unmaintained                                                                              |
-
-Binlog dump, we use the open source
-program [mysql-binlog-connector-java](https://github.com/shyiko/mysql-binlog-connector-java) 
 
 ### Overall structure 
 
@@ -52,23 +32,14 @@ program [mysql-binlog-connector-java](https://github.com/shyiko/mysql-binlog-co
 
 ### Fundamental
 
-A cdc program (here referred to as a running instance) is connected to the mysql
-binlog, which is equivalent to adding a slave library to mysql.
+When  cdc program connected to the mysql server, it is equivalent to adding a slave to mysql.
 
-Read the binlog event through the main thread, send it to the queue, read the
-corresponding queue event by the worker thread, and distribute the event
+Here are two kinds of strategies:
 
-Here are two kinds of sending strategies:
+1.  Provide multiple distribution threads, performance first
 
-1.  Does not guarantee the order of sending, only concerned with the database
-    change operation, the default provides four distribution threads (worker
-    thread), corresponding blocking queue
+2.  Guarantee event sending order, single thread send event, order priority
 
-2.  To ensure the sequence of events sent, seq worker threads send events
-    corresponding to seq blocking queue
-
-Two kinds of strategies can be selected according to actual needs, and the
-former has better performance.
 
 Send event to convert binlog binary stream to JSON format string. This project
 provides rabbitmq message listener and sends messages to rabbitmq TOPIC type
@@ -104,31 +75,28 @@ management](#configuration-management) section). The key lifetime is 60 seconds.
 the thread (helper-thread3) and keep heartbeat with etcd.
 
 The main purpose of service registration is to monitor the status of the
-cluster. Assuming that the program is interrupted abnormally or the server hangs
-up, after 60s, the registered key of etcd expires, so that the faulty machine
-can be accurately located and recovered quickly.
+cluster,the faulty machine can be accurately located and recovered quickly.
 
 #### Distributed lock
 
 In order to ensure high availability of the cdc service. By starting the cdc
 program on multiple servers at the same time, monitor the same slave
-library. Then introduce a distributed lock to ensure that only one instance is
-running at the same time.
+. Then introduce a distributed lock to ensure that only one instance is
+running at the same time,the others standby
 
 Specific to program operation
 
 1.  Try to get distributed lock from etcd
 
-2.  If successful, the connection to the slave is started and the binlog file
+2.  If successful, the connection to the mysql started and the binlog file
     stream event is obtained.
 
-3.  Failed to get, then the main thread waits 5 seconds and then goes back to
+3.  Failed to get, then the main thread waits 5 seconds and  goes back to
     step 1
 
 We uniquely identify a lock through the cluster + instance. The concept of
 clustering was introduced to be compatible with such scenarios: 2 instances are
-open at the same time to listen to the same slave (not recommended). The default
-cluster is master
+open at the same time to listen to the same slave (not recommended). The default cluster is master
 
 #### Save binlog file name and position
 
@@ -152,7 +120,7 @@ The final saved is mysql-bin.000003, 36648. The next time you start the instanc
 it reads the position from etcd and continues to parse the binlog event from
 that position.
 
-> Note: There will be repeated messages when the program restarts
+> Note: There will be repeated messages when the program restarts ,needed by the user to ensure idempotency
 
 #### Configuration management
 
@@ -208,7 +176,7 @@ name
 
 > Note: Table filtering configuration requires at least one, if this feature is enabled.
 ##### Sharding
-For example, if you do a sharding for table orders, you
+For example, if you do a sharding for table, you
 can capture the changes as long as they satisfy the orders\_ prefix table. 
 > Note: the "{suffix}" is a fixed value and cannot be changed.
 ##### Stop table filtering
@@ -294,7 +262,7 @@ Time-related will be converted into a timestamp
 | **key**    | **meaning**                                |
 |------------|--------------------------------------------|
 | database   | database name                              |
-| createtime | Time for generating this message           |
+| createtime | Timestamp for generating this message           |
 | data       | Details of fields inserted in this message |
 | action     | The operation type of this data            |
 | uniqid     | message of md5(except createtime)          |
@@ -351,7 +319,7 @@ Time-related will be converted into a timestamp
 | **key**    | **meaning**                                                                                                                    |
 |------------|--------------------------------------------------------------------------------------------------------------------------------|
 | database   | database name                                                                                                                  |
-| createtime | Time for generating this message                                                                                               |
+| createtime | Timestamp for generating this message                                                                                               |
 | data       | before:The fields and values before the update, are generally primary keys or UK <br />after:Updated fields and corresponding values |
 | action     | The operation type of this data                                                                                                |
 | uniqid     | message of md5(except createtime)                                                                                              |
@@ -382,7 +350,7 @@ Time-related will be converted into a timestamp
 | **key**    | **meaning**                                                                 |
 |------------|-----------------------------------------------------------------------------|
 | database   | database name                                                               |
-| createtime | Time for generating this message                                            |
+| createtime | Timestamp for generating this message                                            |
 | data       | This deleted field and corresponding value are generally primary keys or UK |
 | action     | The operation type of this data                                             |
 | uniqid     | message of md5(except createtime)                                           |
