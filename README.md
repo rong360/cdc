@@ -27,6 +27,7 @@ change data capture, Key Features:
       [mysqld]  
       log-bin=mysql-bin
       binlog-format=ROW
+      server_id=666
       ```
   -   authorize mysql slave read permission
        ```mysql
