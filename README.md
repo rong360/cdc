@@ -3,7 +3,7 @@
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-orange.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Maven Central](https://img.shields.io/maven-central/v/com.rong360/cdc.svg?style=flat-square)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.rong360%22%20AND%20a%3A%22cdc%22)
 
-A mysql binlog parser, which has running stable for more then 36 months in our production environment on more than 10 mysql instances. It transforms binlog event(insert/delete/update) into json format data into rabbitmq or other mq(such as kafka), Based on this project:  [mysql-binlog-connector-java](https://github.com/shyiko/mysql-binlog-connector-java) .
+A mysql binlog parser, which has running stable for more then 36 months in our production environment on more than 10 mysql instances. It transforms binlog event(insert/delete/update) into json format data into rabbitmq or other mq(such as kafka), Based on this project:  [mysql-binlog-connector-java](https://github.com/shyiko/mysql-binlog-connector-java).
 ## What is cdc?
 change data capture, Key Features:
 - High availability, cluster deployment
