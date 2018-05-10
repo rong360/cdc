@@ -3,18 +3,20 @@
 [![License](https://img.shields.io/badge/Licence-Apache%202.0-orange.svg?style=flat-square)](http://www.apache.org/licenses/LICENSE-2.0.html)
 [![Maven Central](https://img.shields.io/maven-central/v/com.rong360/cdc.svg?style=flat-square)](http://search.maven.org/#search%7Cga%7C1%7Cg%3A%22com.rong360%22%20AND%20a%3A%22cdc%22)
 
-mysql binlog parser json into rabbitmq or others(such as kafka)
+A mysql binlog parser,which has running stable for more then 36 months in our production envireonment on more then 10 mysql instances . It transform binlog event(inert/delete/update) into json format data into rabbitmq or other mq(such as kafka), Based on this project:https://github.com/shyiko/mysql-binlog-connector-java.
 ## What is cdc?
 change data capture, Key Features:
 - High availability, cluster deployment
-- Table level filter binlog file
-- Supports all mysql field parsing
-- Automatically save the binlog location node, smooth upgrade and restart, data can not be lost
+- Table level filter
+- Supports almost all mysql field parsing
+- Automatically save  binlog file/position, smooth upgrade and restart
 - Configure centralized management
 - Operational status monitoring
 - Dynamically loading table configuration files
-- Support for adding multiple exported data sources for easy expansion to kafka or other
-## Software Versions
+- support split table config
+- Mysql binlog data order Guaranteed 
+- Support a easy way to tap it into other mq (sucn as kafka,nsq,redis...)
+## dependency
 
 - Java 8 or above is required.
 - etcd 3.0 or above is required.
