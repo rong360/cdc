@@ -22,6 +22,19 @@ change data capture, Key Features:
 - etcd 3.0 or above is required.
 - mysql 5.6+
 
+  -   open mysql binlog log
+      ```html
+      [mysqld]  
+      log-bin=mysql-bin
+      binlog-format=ROW
+      ```
+  -   authorize mysql slave read permission
+       ```mysql
+       CREATE USER root IDENTIFIED BY 'root'; 
+       GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'root'@'%';
+       FLUSH PRIVILEGES;
+       ```
+
 ## Download
 
 ### Maven
