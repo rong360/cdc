@@ -30,7 +30,7 @@ change data capture, Key Features:
       ```
   -   authorize mysql slave read permission
        ```mysql
-       CREATE USER root IDENTIFIED BY 'root'; 
+       CREATE USER root IDENTIFIED BY '123'; 
        GRANT SELECT, REPLICATION SLAVE, REPLICATION CLIENT ON *.* TO 'root'@'%';
        FLUSH PRIVILEGES;
        ```
