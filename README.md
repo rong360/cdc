@@ -61,7 +61,7 @@ etcdctl put cdc/master/admin/config/app/mysql/password 123
 * Start program
 ```java
 CdcClient client = new CdcClient("http://127.0.0.1:2379", "", "");
-client.setInstance("admin");
+client.setInstance("admin");//"admin" is one of the ETCD configuration prefix elements
 client.setWatchAllTable(true);
 client.start();
 ```
