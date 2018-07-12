@@ -102,7 +102,11 @@
             <artifactId>jts</artifactId>
             <version>1.13</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>1.1.10</version>
+        </dependency>
     </dependencies>
 
     <parent>

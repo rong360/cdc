@@ -60,28 +60,28 @@ public class EtcdApi {
 
     public static void getLock(long leaseId) {
         while (true) {
-            try {
+            try (Lock lockClient = EtcdClient.getOneInstance().getLockClient()) {
                 logger.info("try to get distribute lock....");
-                Lock lockClient = EtcdClient.getInstance().getLockClient();
-                lockClient.lock(
-                        ByteSequence.fromString(RongUtil.getLockKey()),
-                        leaseId).get().getKey();
-                logger.info("get distribute lock suc!!");
+                String lockKey = lockClient.lock(
+                        ByteSequence.fromString(RongUtil.getLockKey()), leaseId).get().getKey().toStringUtf8();
+                logger.info("get distribute lock suc!! lock key: {}, leaseId: {}", lockKey, leaseId);
                 return;
             } catch (Exception e) {
-                logger.info("get distribute lock fail..., try again");
+                logger.error("get distribute lock fail..., try again", e);
             }
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.error("get lock thread sleep", e);
             }
         }
     }
 
     public static void keepAliveOnce(long leaseId) {
         try {
-            EtcdClient.getInstance().getLeaseClient().keepAliveOnce(leaseId).get(timeOut, TimeUnit.MILLISECONDS);
+            logger.info("begin keep alive");
+            long ttl = EtcdClient.getInstance().getLeaseClient().keepAliveOnce(leaseId).get(timeOut, TimeUnit.MILLISECONDS).getTTL();
+            logger.info("keep alive, ttl: {}, leaseId: {} ({})", ttl, leaseId, Long.toHexString(leaseId));
         } catch (Exception e) {
             logger.warn("keep alive leaseId:{} error", leaseId, e);
         }

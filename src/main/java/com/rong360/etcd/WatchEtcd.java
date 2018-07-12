@@ -1,5 +1,6 @@
 package com.rong360.etcd;
 
+import com.coreos.jetcd.Client;
 import com.coreos.jetcd.Watch;
 import com.coreos.jetcd.data.ByteSequence;
 import com.coreos.jetcd.options.WatchOption;
@@ -16,28 +17,35 @@ import org.slf4j.LoggerFactory;
 public class WatchEtcd implements Runnable {
     private final static Logger logger = LoggerFactory.getLogger(WatchEtcd.class);
     private String key;
+    private ByteSequence watchKey;
+    private WatchOption watchOption;
 
     public WatchEtcd(String key) {
         this.key = key;
+        this.watchKey = ByteSequence.fromString(this.key);
+        this.watchOption = WatchOption.newBuilder().withPrefix(this.watchKey).build();
     }
 
     @Override
     public void run() {
-
-        Watch.Watcher watcher = EtcdClient.getInstance().getWatchClient().watch(
-                ByteSequence.fromString(this.key),
-                WatchOption.newBuilder().withPrefix(ByteSequence.fromString(this.key)).build()
-        );
         while (true) {
-            try {
-                WatchResponse response = watcher.listen();
-                for (WatchEvent event : response.getEvents()) {
-                    logger.info("watch and update cdc config\n{} {} {}",
-                            event.getEventType().toString(),
-                            event.getKeyValue().getKey().toStringUtf8(),
-                            event.getKeyValue().getValue().toStringUtf8());
+            try (Client client = EtcdClient.getOneInstance().getEtcdClient();
+                 Watch watchClient = client.getWatchClient();
+                 Watch.Watcher watcher = watchClient.watch(this.watchKey, this.watchOption)) {
+                while (true) {
+                    WatchResponse response = watcher.listen();
+                    for (WatchEvent event : response.getEvents()) {
+                        logger.info("watch and update cdc config\n{} {} {}",
+                                event.getEventType().toString(),
+                                event.getKeyValue().getKey().toStringUtf8(),
+                                event.getKeyValue().getValue().toStringUtf8());
+                    }
+                    try {
+                        GlobalConfig.loadCdcConf();
+                    } catch (Exception e) {
+                        logger.error("watch reload config", e);
+                    }
                 }
-                GlobalConfig.loadCdcConf();
             } catch (Exception e) {
                 logger.warn("watch error", e);
             }

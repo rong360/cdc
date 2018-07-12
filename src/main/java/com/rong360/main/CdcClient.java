@@ -8,6 +8,7 @@ import com.mysql.jdbc.StringUtils;
 import com.rong360.binlogutil.GlobalConfig;
 import com.rong360.binlogutil.RongUtil;
 import com.rong360.etcd.EtcdApi;
+import com.rong360.etcd.EtcdClient;
 import com.rong360.etcd.GuardEtcd;
 import com.rong360.etcd.WatchEtcd;
 import com.rong360.model.QueueData;
@@ -81,12 +82,22 @@ public class CdcClient {
             final LoggerContext ctx = (LoggerContext) LogManager.getContext(false);
             ctx.reconfigure();
 
-            ip = InetAddress.getLocalHost().getHostName();
+            ip = InetAddress.getLocalHost().getHostAddress();
             String name = ManagementFactory.getRuntimeMXBean().getName();
             pid = name.split("@")[0];
 
             registerLeaseId = EtcdApi.register(RongUtil.getRegisterKey(), Constant.REGISTER_STATUS_OK);
+            logger.info("register success: {}", registerLeaseId);
             new Thread(new GuardEtcd(registerLeaseId)).start();
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                logger.info("revoke {}", registerLeaseId);
+                try {
+                    EtcdClient.getInstance().getLeaseClient().revoke(registerLeaseId).get();
+                } catch (Exception e) {
+                    logger.error("revoke {}", registerLeaseId, e);
+                }
+            }));
 
             EtcdApi.getLock(registerLeaseId);
 
@@ -140,6 +151,7 @@ public class CdcClient {
     /**
      * Register message listener. Note that multiple message listeners will be called in order they
      * where registered.
+     *
      * @param messageListener message listener
      */
     public void registerMessageListener(MessageListener messageListener) {
@@ -149,7 +161,7 @@ public class CdcClient {
     /**
      * @return registered message listeners
      */
-    public static List<MessageListener>  getMessageListeners() {
+    public static List<MessageListener> getMessageListeners() {
         return Collections.unmodifiableList(messageListeners);
     }
 

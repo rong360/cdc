@@ -1,11 +1,15 @@
 package com.rong360.database;
 
+import com.alibaba.druid.pool.DruidDataSource;
 import com.rong360.binlogutil.GlobalConfig;
 import net.sf.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -18,7 +22,10 @@ import java.util.regex.Pattern;
 public class ColumnDao {
 
     private static Logger log = LoggerFactory.getLogger(ColumnDao.class);
-    private static ConcurrentHashMap<String, HashMap<Integer, String>> tableColumnMap = new ConcurrentHashMap<String, HashMap<Integer, String>>();
+    private static final String SCHEMA_SQL = "SELECT column_name,ordinal_position,COLUMN_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE table_schema = ? AND table_name = ?";
+    private static ConcurrentHashMap<String, HashMap<Integer, String>> tableColumnMap = new ConcurrentHashMap<>();
+
+    private static final DruidDataSource dataSource = new DruidDataSource();
 
     public void removeCache(String dbName, String tableName) {
 
@@ -31,59 +38,22 @@ public class ColumnDao {
         tableColumnMap.clear();
     }
 
-
-    public HashMap<Integer, String> getColumnByTable(String dbName, String tableName) {
-
-        PreparedStatement ps = null;
-        ResultSet rs = null;
-        HashMap<Integer, String> result = null;
-
-        String mapKey = dbName.toLowerCase() + ":" + tableName.toLowerCase();
-        result = tableColumnMap.get(mapKey);
-        if (result != null && result.size() > 0) {
-            return result;
-        }
-        result = new HashMap<Integer, String>();
-        String sql = "select column_name,ordinal_position,COLUMN_TYPE from INFORMATION_SCHEMA.COLUMNS where table_schema = ? and table_name = ?";
-        Connection connection = null;
+    static {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
-            String url = "jdbc:mysql://%s:%s/INFORMATION_SCHEMA?user=%s&password=%s&useUnicode=true&characterEncoding=UTF8";
-            url = String.format(url, GlobalConfig.mysql_host, GlobalConfig.mysql_port, GlobalConfig.mysql_username, GlobalConfig.mysql_password);
-            connection = DriverManager.getConnection(url);
-            ps = connection.prepareStatement(sql);
-            ps.setString(1, dbName);
-            ps.setString(2, tableName);
-            rs = ps.executeQuery();
-
-            if (rs != null) {
-                while (rs.next()) {
-                    Integer position = rs.getInt(2);
-                    String columnName = rs.getString(1);
-                    Map<String, Object> map = new HashMap<>();
-                    map.put("name", columnName);
-                    String type = rs.getString(3);
-                    getType(type, map);
-                    JSONObject obj = JSONObject.fromObject(map);
-                    result.put(position - 1, obj.toString());
-                }
-            }
-            rs.close();
-            ps.close();
-            tableColumnMap.put(mapKey, result);
-
-        } catch (ClassNotFoundException e) {
-            log.error("db", e);
-        } catch (SQLException e) {
-            log.error("db", e);
-        } finally {
-            try {
-                connection.close();
-            } catch (SQLException e) {
-                log.error("db close", e);
-            }
+            dataSource.setUrl(String.format("jdbc:mysql://%s:%s?useUnicode=true&characterEncoding=UTF8", GlobalConfig.mysql_host, GlobalConfig.mysql_port));
+            dataSource.setUsername(GlobalConfig.mysql_username);
+            dataSource.setPassword(GlobalConfig.mysql_password);
+            dataSource.setInitialSize(1);
+            dataSource.setMaxActive(2);
+            dataSource.setMinIdle(1);
+            dataSource.setMinEvictableIdleTimeMillis(300 * 1000);
+            dataSource.setTimeBetweenEvictionRunsMillis(180 * 1000);
+            dataSource.setTestWhileIdle(true);
+            dataSource.setTestOnBorrow(false);
+            dataSource.setValidationQuery("SELECT 1");
+        } catch (Exception e) {
+            log.error("init data source", e);
         }
-        return result;
     }
 
     public static void getType(String type, Map<String, Object> map) {
@@ -110,17 +80,56 @@ public class ColumnDao {
         map.put("list", list);
     }
 
-    public static void main(String[] args) {
-        String sql = "/*!40000 ALTER TABLE `apply_info` DISABLE KEYS */";
-        sql = sql.replaceAll("`", "");
-        Pattern pattern = Pattern.compile("(alter)(\\s+)(table)(\\s+)(\\w+)(\\s+)(.*)", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = pattern.matcher(sql);
-        String table = "";
-        if (matcher.find()) {
-            table = matcher.group(5);
-            System.out.println(table);
+    public static void getSlaveStatus() {
+        try (
+                Connection conn = dataSource.getConnection();
+                Statement stmt = conn.createStatement();
+                ResultSet rs = stmt.executeQuery("SHOW SLAVE STATUS")) {
+
+            String relayMasterLogFile = "", execMasterLogPos = "";
+            while (rs.next()) {
+                relayMasterLogFile = rs.getString("Relay_Master_Log_File");
+                execMasterLogPos = rs.getString("Exec_Master_Log_Pos");
+            }
+            log.info("show slave status, master log file:{}, pos:{}", relayMasterLogFile, execMasterLogPos);
+        } catch (Exception e) {
+            log.error("db", e);
         }
     }
 
+    public HashMap<Integer, String> getColumnByTable(String dbName, String tableName) {
+        HashMap<Integer, String> result;
+
+        String mapKey = dbName.toLowerCase() + ":" + tableName.toLowerCase();
+        result = tableColumnMap.get(mapKey);
+        if (result != null && result.size() > 0) {
+            return result;
+        }
+        result = new HashMap<>();
+        try (
+                Connection conn = dataSource.getConnection();
+                PreparedStatement ps = conn.prepareStatement(SCHEMA_SQL)) {
+            ps.setString(1, dbName);
+            ps.setString(2, tableName);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs != null) {
+                    while (rs.next()) {
+                        Integer position = rs.getInt(2);
+                        String columnName = rs.getString(1);
+                        Map<String, Object> map = new HashMap<>();
+                        map.put("name", columnName);
+                        String type = rs.getString(3);
+                        getType(type, map);
+                        JSONObject obj = JSONObject.fromObject(map);
+                        result.put(position - 1, obj.toString());
+                    }
+                }
+                tableColumnMap.put(mapKey, result);
+            }
+        } catch (Exception e) {
+            log.error("query db", e);
+        }
+        return result;
+    }
 
 }

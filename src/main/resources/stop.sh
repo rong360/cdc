@@ -34,7 +34,7 @@ fi
 for file in ${DIRS[@]}
   do
   	echo "stopping "$master" cluster's instance:"$file
-    ps -ef | grep com.rong360.main.Rong360CDC | grep "$file$fileext"|grep "$master" | grep -v grep | awk  '{print $2}' | xargs kill -15
+    ps -ef | grep com.rong360.main.Rong360CDC | grep "$file$fileext"|grep "$master$" | grep -v grep | awk  '{print $2}' | xargs kill -15
     sleep 1
   done
 

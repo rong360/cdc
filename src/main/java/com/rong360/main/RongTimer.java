@@ -4,6 +4,7 @@ package com.rong360.main;
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.rong360.binlogutil.GlobalConfig;
 import com.rong360.binlogutil.RongUtil;
+import com.rong360.database.ColumnDao;
 import com.rong360.etcd.EtcdApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class RongTimer implements Runnable {
 
     private final static Logger logger = LoggerFactory.getLogger(RongTimer.class);
-    private BinaryLogClient client = null;
+    private BinaryLogClient client;
 
     final Integer refreshInterval = 5000;
     final Integer workerNum = 4;
@@ -31,13 +32,13 @@ public class RongTimer implements Runnable {
             EventHandler[] threadArr = new EventHandler[workerNum + 1];
             for (int i = 0; i < workerNum + 1; i++) {
                 if (i < workerNum && GlobalConfig.isNeedperThread) {
-                    threadArr[i] = new EventHandler("performance priority queue-" + i, client, 1);
+                    threadArr[i] = new EventHandler("performance priority queue-" + i, client, Constant.THREAD_TYPE_PER);
                     threadArr[i].start();
                 } else if (i == workerNum && GlobalConfig.isNeedseqThread) {
-                    threadArr[i] = new EventHandler("seq priority queue-", client, 2);
+                    threadArr[i] = new EventHandler("seq priority queue", client, Constant.THREAD_TYPE_SEQ);
                     threadArr[i].start();
                 } else {
-                    threadArr[i] = new EventHandler("no need", client, 3);
+                    threadArr[i] = new EventHandler("no need", client, Constant.THREAD_TYPE_OTH);
                 }
             }
 
@@ -45,6 +46,7 @@ public class RongTimer implements Runnable {
                 if (client.isMainThreadFinish())
                     break;
                 EventHandler.dumpBinlogPos();
+                ColumnDao.getSlaveStatus();
                 if (!setLockInf) {
                     //Identify who takes the lock
                     setLockInf = EtcdApi.registerByLeaseId(RongUtil.getRegisterKey(), Constant.REGISTER_STATUS_RUN, CdcClient.registerLeaseId);
@@ -52,11 +54,11 @@ public class RongTimer implements Runnable {
                 for (int i = 0; i < workerNum + 1; i++) {
                     boolean needRevoke = false;
                     if (i < workerNum && !threadArr[i].isAlive() && GlobalConfig.isNeedperThread) {
-                        threadArr[i] = new EventHandler("performance priority queue-" + i, client, 1);
+                        threadArr[i] = new EventHandler("performance priority queue-" + i, client, Constant.THREAD_TYPE_PER);
                         needRevoke = true;
                     }
                     if (i == workerNum && !threadArr[i].isAlive() && GlobalConfig.isNeedseqThread) {
-                        threadArr[i] = new EventHandler("seq priority queue", client, 2);
+                        threadArr[i] = new EventHandler("seq priority queue", client, Constant.THREAD_TYPE_SEQ);
                         needRevoke = true;
                     }
                     if (needRevoke) {

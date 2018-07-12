@@ -2,14 +2,12 @@ package com.rong360.main;
 
 import com.github.shyiko.mysql.binlog.BinaryLogClient;
 import com.github.shyiko.mysql.binlog.event.*;
+import com.rong360.binlogutil.BinlogInfo;
 import com.rong360.binlogutil.EventDataUtil;
 import com.rong360.binlogutil.RongUtil;
 import com.rong360.database.ColumnDao;
 import com.rong360.etcd.EtcdApi;
-import com.rong360.model.DeleteQueueData;
-import com.rong360.model.InsertQueueData;
 import com.rong360.model.QueueData;
-import com.rong360.model.UpdateQueueData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,17 +23,22 @@ import java.util.concurrent.TimeUnit;
  */
 public class EventHandler extends Thread {
 
-    private static LinkedBlockingQueue<Event> EventQueuePer = new LinkedBlockingQueue<Event>();
-    private static LinkedBlockingQueue<Event> EventQueueSeq = new LinkedBlockingQueue<Event>();
-    public static ConcurrentHashMap<String, ConcurrentHashMap<String, String>> threadBinlogMap =
-            new ConcurrentHashMap<String, ConcurrentHashMap<String, String>>();
     private final static Logger log = LoggerFactory.getLogger(EventHandler.class);
-    private BinaryLogClient client = null;
-    private String threadName = "";
-    private List<QueueData> dataList = new ArrayList<QueueData>();
-    private long batchTime = 0;
-    public boolean pubResult = true;
-    private Integer threadType = 0;
+    private static LinkedBlockingQueue<Event> EventQueuePer = new LinkedBlockingQueue<>();
+    private static LinkedBlockingQueue<Event> EventQueueSeq = new LinkedBlockingQueue<>();
+    private static ConcurrentHashMap<String, BinlogInfo> threadBinlogMap =
+            new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, String> threadWaitBinlogMap = new ConcurrentHashMap<>();
+    private BinaryLogClient client;
+    private String threadName;
+    private List<QueueData> dataList = new ArrayList<>();
+    private Integer threadType;
+
+    public EventHandler(String name, BinaryLogClient client, Integer threadType) {
+        this.threadName = name;
+        this.client = client;
+        this.threadType = threadType;
+    }
 
     public static void pushPerQueue(Event event) {
         boolean bl = EventQueuePer.offer(event);
@@ -55,11 +58,53 @@ public class EventHandler extends Thread {
         }
     }
 
+    //The minimum binlog pos will be sent, dump to etcd
+    public static void dumpBinlogPos() {
+        if (threadBinlogMap.size() == 0) {
+            return;
+        }
+        BinlogInfo seqBinlogInfo = new BinlogInfo("", 0);
+        BinlogInfo perBinlogInfo = new BinlogInfo("", 0);
+        for (String s : threadBinlogMap.keySet()) {
+            BinlogInfo info = threadBinlogMap.get(s);
+            log.info("thread[" + s + "]:fileName=" + info.getFileName() + ",pos=" + info.getPos());
+            if (s.startsWith("seq priority queue")) {
+                if (info.compareBinlog(seqBinlogInfo)) {
+                    seqBinlogInfo = info;
+                }
+            } else if (info.compareBinlog(perBinlogInfo)) {
+                perBinlogInfo = info;
+            }
+        }
 
-    public EventHandler(String name, BinaryLogClient client, Integer threadType) {
-        this.threadName = name;
-        this.client = client;
-        this.threadType = threadType;
+        boolean perIgnore = true, seqIgnore = true;
+        for (String s : threadWaitBinlogMap.keySet()) {
+            if (threadWaitBinlogMap.get(s) == null) {
+                continue;
+            }
+            if (s.startsWith("seq priority queue")) {
+                seqIgnore = false;
+            } else {
+                perIgnore = false;
+            }
+        }
+
+        BinlogInfo successBinlogInfo;
+        if (seqIgnore && perIgnore) {
+            successBinlogInfo = perBinlogInfo.compareBinlog(seqBinlogInfo) ? perBinlogInfo : seqBinlogInfo;
+        } else if (seqIgnore || perIgnore) {
+            if (seqIgnore) {
+                successBinlogInfo = perBinlogInfo;
+            } else {
+                successBinlogInfo = seqBinlogInfo;
+            }
+        } else {
+            successBinlogInfo = !perBinlogInfo.compareBinlog(seqBinlogInfo) ? perBinlogInfo : seqBinlogInfo;
+        }
+
+        EtcdApi.set(RongUtil.getBinlogFileKey(), successBinlogInfo.getFileName());
+        EtcdApi.set(RongUtil.getBinlogPosKey(), successBinlogInfo.getPos() + "");
+        log.info("update Position:{},update file:{}", successBinlogInfo.getFileName(), successBinlogInfo.getPos());
     }
 
     public String getThreadName() {
@@ -67,137 +112,87 @@ public class EventHandler extends Thread {
     }
 
     private Event poolEvent() throws InterruptedException {
-        if (this.threadType == 1) {
+        if (this.threadType == Constant.THREAD_TYPE_PER) {
             return EventQueuePer.poll(1, TimeUnit.SECONDS);
         } else {
             return EventQueueSeq.poll(1, TimeUnit.SECONDS);
         }
     }
 
-    //Find the smallest file and pos saved by each thread, dump to etcd
-    public static void dumpBinlogPos() {
-        if (threadBinlogMap.size() == 0) {
-            return;
-        }
-        int minFile = Integer.MAX_VALUE;
-        long minPos = Long.MAX_VALUE;
-        String minFileName = "";
-        for (String s : threadBinlogMap.keySet()) {
-            ConcurrentHashMap<String, String> tmp = threadBinlogMap.get(s);
-            String fileName = tmp.get("filename");
-            long pos = Long.valueOf(tmp.get("filepos"));
-            log.info("thread[" + s + "]:fileName=" + fileName + ",pos=" + pos);
-            if (fileName.startsWith("mysql-bin.")) {
-                int file = Integer.valueOf(fileName.substring(10));
-                if (minFile > file) {
-                    minFile = file;
-                    minFileName = fileName;
-                    minPos = pos;
-                } else if (minFile == file
-                        && pos < minPos) {
-                    minPos = pos;
-                }
-            }
-        }
-        EtcdApi.set(RongUtil.getBinlogFileKey(), minFileName);
-        EtcdApi.set(RongUtil.getBinlogPosKey(), minPos + "");
-        log.info("update Position:" + minPos + ",update file:" + minFileName);
-    }
-
     public void run() {
-        Event event = null;
+        Event event;
+        String dbName = "", tblName = "", action = "", binlogFilename, binloginfo, eventType;
+        ArrayList<String> result = new ArrayList<>();
+        long nextBinlogPosition, binlogPosition;
         while (true) {
             try {
                 if (client.isMainThreadFinish()) {
                     break;
                 }
                 event = poolEvent();
-                long nowTime = System.currentTimeMillis() / 1000;
                 if (event == null) {
-                    if (dataList.size() > 0) {
-                        boolean sendRet = CdcClient.notifyMessageListeners(dataList);
-                        if (sendRet) {
-                            log.info("[thread:" + this.threadName + "]: send data:" + dataList.size());
-                            dataList.clear();
-                            batchTime = nowTime;
-                        }
-                    }
+                    threadWaitBinlogMap.remove(this.threadName);
                     continue;
                 }
-                String eventType = event.getHeader().getEventType().toString();
-                ArrayList<String> result = new ArrayList<String>();
-                String dbName = "";
-                String tblName = "";
-                String action = "";
-                if (event.getData() == null) {
+                EventHeaderV4 trackableEventHeader = event.getHeader();
+                eventType = trackableEventHeader.getEventType().toString();
+                binlogFilename = trackableEventHeader.getBinlogFilename();
+                nextBinlogPosition = trackableEventHeader.getNextPosition();
+                binlogPosition = trackableEventHeader.getPosition();
+                binloginfo = binlogFilename + " " + binlogPosition;
+                threadWaitBinlogMap.put(this.threadName, binlogFilename + " " + nextBinlogPosition);
+
+                result.clear();
+                String[] orgName;
+                switch (eventType) {
+                    case "EXT_WRITE_ROWS":
+                        action = "insert";
+                        WriteRowsEventData wed = event.getData();
+                        orgName = EventDataUtil.getDbTableName(wed.getTableId());
+                        dbName = orgName[0];
+                        tblName = orgName[1];
+                        result = EventDataUtil.insertQueueTojson(wed.getTableId(), EventDataUtil.getInsertEventData(wed.getIncludedColumns(), wed.getRows(), new ColumnDao().getColumnByTable(dbName, tblName)), binloginfo);
+                        break;
+                    case "EXT_UPDATE_ROWS":
+                        action = "update";
+                        UpdateRowsEventData ued = event.getData();
+                        orgName = EventDataUtil.getDbTableName(ued.getTableId());
+                        dbName = orgName[0];
+                        tblName = orgName[1];
+                        result = EventDataUtil.updateQueueToJson(ued.getTableId(), EventDataUtil.getUpdateEventData(
+                                ued.getIncludedColumnsBeforeUpdate(), ued.getIncludedColumns(), new ColumnDao().getColumnByTable(dbName, tblName), ued.getRows()), binloginfo);
+                        break;
+                    case "EXT_DELETE_ROWS":
+                        action = "delete";
+                        DeleteRowsEventData ded = event.getData();
+                        orgName = EventDataUtil.getDbTableName(ded.getTableId());
+                        dbName = orgName[0];
+                        tblName = orgName[1];
+                        result = EventDataUtil.deleteQueueToJson(ded.getTableId(), EventDataUtil.getDeleteEventData(ded.getIncludedColumns(), new ColumnDao().getColumnByTable(dbName, tblName), ded.getRows()), binloginfo);
+                        break;
+                }
+
+                if (result.isEmpty()) {
+                    log.warn("empty result");
                     continue;
                 }
-                if (eventType.equals("EXT_WRITE_ROWS")) {
-                    action = "insert";
-                    WriteRowsEventData wed = event.getData();
-                    String[] orgName = EventDataUtil.getDbTableName(wed.getTableId());
-                    dbName = orgName[0];
-                    tblName = orgName[1];
-                    ArrayList<InsertQueueData> queueData =
-                            EventDataUtil.getInsertEventData(wed.getIncludedColumns(), wed.getRows(), new ColumnDao().getColumnByTable(dbName, tblName));
-                    result = EventDataUtil.insertQueueTojson(wed.getTableId(), queueData);
 
-                } else if (eventType.equals("EXT_UPDATE_ROWS")) {
-                    action = "update";
-                    UpdateRowsEventData ued = event.getData();
-                    String[] orgName = EventDataUtil.getDbTableName(ued.getTableId());
-                    dbName = orgName[0];
-                    tblName = orgName[1];
-                    ArrayList<UpdateQueueData> queueData =
-                            EventDataUtil.getUpdateEventData(
-                                    ued.getIncludedColumnsBeforeUpdate(), ued.getIncludedColumns(), new ColumnDao().getColumnByTable(dbName, tblName), ued.getRows());
-                    result = EventDataUtil.updateQueueToJson(ued.getTableId(), queueData);
-                } else if (eventType.equals("EXT_DELETE_ROWS")) {
-                    action = "delete";
-                    DeleteRowsEventData ded = event.getData();
-                    String[] orgName = EventDataUtil.getDbTableName(ded.getTableId());
-                    dbName = orgName[0];
-                    tblName = orgName[1];
-                    ArrayList<DeleteQueueData> queueData =
-                            EventDataUtil.getDeleteEventData(ded.getIncludedColumns(), new ColumnDao().getColumnByTable(dbName, tblName), ded.getRows());
-                    result = EventDataUtil.deleteQueueToJson(ded.getTableId(), queueData);
+                for (String message : result) {
+                    QueueData tmp = new QueueData();
+                    tmp.setMessage(message);
+                    tmp.setRoutingKey(RongUtil.getRoutingKey(dbName, tblName, action));
+                    dataList.add(tmp);
                 }
-                if (result.size() > 0) {
-                    for (String message : result) {
-                        QueueData tmp = new QueueData();
-                        tmp.setMessage(message);
-                        tmp.setRoutingKey(RongUtil.getRoutingKey(dbName, tblName, action));
-                        dataList.add(tmp);
-                    }
-                }
-                if (dataList.size() >= 5 || nowTime - batchTime > 5) {
-                    if (dataList.size() > 0) {
-                        boolean sendRet = CdcClient.notifyMessageListeners(dataList);
-                        EventHeaderV4 trackableEventHeader = (EventHeaderV4) event.getHeader();
-                        long nextBinlogPosition = trackableEventHeader.getNextPosition();
-                        if (sendRet) {
-                            log.info("[thread:" + this.threadName + "]: send data:" + dataList.size());
-                            dataList.clear();
-                            batchTime = nowTime;
-                            if (dataList.size() == 0) {
-                                if (nextBinlogPosition > 0) {
-                                    String binlogFilename = this.client.getBinlogFilename();
-                                    if (trackableEventHeader.getBinlogFilename() != null) {
-                                        binlogFilename = trackableEventHeader.getBinlogFilename();
-                                    }
-                                    ConcurrentHashMap<String, String> binlogPosMap = new ConcurrentHashMap<String, String>();
-                                    binlogPosMap.put("filename", binlogFilename);
-                                    binlogPosMap.put("filepos", String.valueOf(nextBinlogPosition));
-                                    threadBinlogMap.put(this.threadName, binlogPosMap);
-                                    binlogPosMap = null;
-                                }
-                            }
-
-                        } else {
-                            if (nextBinlogPosition > 0) {
-                                log.info("[thread:" + this.threadName + "]send message fail: Position:" + nextBinlogPosition + ",file:" + this.client.getBinlogFilename());
-                            }
-                        }
+                boolean sendRet = false;
+                while (!sendRet) {
+                    sendRet = CdcClient.notifyMessageListeners(dataList);
+                    if (sendRet) {
+                        log.info("[thread:" + this.threadName + "]: send data:" + dataList.size());
+                        dataList.clear();
+                        BinlogInfo binlogInfo = new BinlogInfo(binlogFilename, nextBinlogPosition);
+                        threadBinlogMap.put(this.threadName, binlogInfo);
+                    } else {
+                        log.warn("[thread:{}]send message fail: position:{},file:{}", this.threadName, binlogPosition, binlogFilename);
                     }
                 }
             } catch (Exception e) {

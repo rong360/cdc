@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public class EventDataUtil {
 
-    public static ConcurrentHashMap<Long, String> tableIdMap = new ConcurrentHashMap<Long, String>();
+    public static ConcurrentHashMap<Long, String> tableIdMap = new ConcurrentHashMap<>();
     public static Logger log = LoggerFactory.getLogger("queue");
 
 
@@ -45,7 +45,7 @@ public class EventDataUtil {
 
     }
 
-    public static ArrayList<String> deleteQueueToJson(long tableId, ArrayList<DeleteQueueData> deleteList) {
+    public static ArrayList<String> deleteQueueToJson(long tableId, ArrayList<DeleteQueueData> deleteList, String binloginfo) {
         String[] oriName = getDbTableName(tableId);
         String dbName = oriName[0];
         String tableName = oriName[1];
@@ -57,6 +57,7 @@ public class EventDataUtil {
             map.put("table", tableName);
             map.put("action", "delete");
             map.put("data", dqd.getAftertDelete());
+            map.put("binloginfo", binloginfo);
             map.put("uniqid", RongUtil.getMd5(map.toString()));
             map.put("createtime", System.currentTimeMillis());
             JSONObject obj = JSONObject.fromObject(map);
@@ -66,7 +67,7 @@ public class EventDataUtil {
         return result;
     }
 
-    public static ArrayList<String> insertQueueTojson(long tableId, ArrayList<InsertQueueData> insertList) {
+    public static ArrayList<String> insertQueueTojson(long tableId, ArrayList<InsertQueueData> insertList, String binloginfo) {
         String[] oriName = getDbTableName(tableId);
         String dbName = oriName[0];
         String tableName = oriName[1];
@@ -77,6 +78,7 @@ public class EventDataUtil {
             map.put("table", tableName);
             map.put("action", "insert");
             map.put("data", iqd.getAfterInsert());
+            map.put("binloginfo", binloginfo);
             map.put("uniqid", RongUtil.getMd5(map.toString()));
             map.put("createtime", System.currentTimeMillis());
             JSONObject obj = JSONObject.fromObject(map);
@@ -86,7 +88,7 @@ public class EventDataUtil {
         return result;
     }
 
-    public static ArrayList<String> updateQueueToJson(long tableId, ArrayList<UpdateQueueData> updateList) {
+    public static ArrayList<String> updateQueueToJson(long tableId, ArrayList<UpdateQueueData> updateList, String binloginfo) {
         String[] oriName = getDbTableName(tableId);
         String dbName = oriName[0];
         String tableName = oriName[1];
@@ -100,6 +102,7 @@ public class EventDataUtil {
             dataMap.put("before", uqd.getBeforeUpdate());
             dataMap.put("after", uqd.getAfterUpdate());
             map.put("data", dataMap);
+            map.put("binloginfo", binloginfo);
             map.put("uniqid", RongUtil.getMd5(map.toString()));
             map.put("createtime", System.currentTimeMillis());
             JSONObject obj = JSONObject.fromObject(map);

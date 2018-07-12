@@ -39,6 +39,10 @@ public class EtcdClient {
         return sInstance;
     }
 
+    public static EtcdClient getOneInstance() {
+        return new EtcdClient();
+    }
+
     public Client getEtcdClient() {
         return client;
     }

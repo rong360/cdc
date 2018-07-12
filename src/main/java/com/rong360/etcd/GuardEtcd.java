@@ -23,7 +23,6 @@ public class GuardEtcd implements Runnable {
             try {
                 Thread.sleep(refreshInterval);
                 EtcdApi.keepAliveOnce(this.leaseId);
-                logger.info("keep lease ttl with etcd...");
             } catch (Exception e) {
                 logger.error("keep lease ttl with etcd error", e);
             }

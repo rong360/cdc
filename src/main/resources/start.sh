@@ -1,5 +1,5 @@
 #!/bin/bash
-SHELL_FOLDER=$(cd "$(dirname "$0")";pwd)
+SHELL_FOLDER=$(dirname $(readlink -f $0))
 cd $SHELL_FOLDER
 instance=""
 master=""
@@ -52,16 +52,16 @@ fi
 
 for file in ${DIRS[@]}
   do
-		pid=`ps aux | grep com.rong360.main.Rong360CDC |grep "$file$fileext" |grep "$master"| grep -v grep | awk  '{print $2}'`
+		pid=`ps aux | grep com.rong360.main.Rong360CDC |grep "$file$fileext" |grep "$master$"| grep -v grep | awk  '{print $2}'`
 		if [ -z $pid ];then
 			echo "starting "$master" cluster's instance:"$file
-			nohup $javaBin -Xms1024m -Xmx1024m -Xmn512m -Djava.ext.dirs=lib -Djava.awt.headless=true $JAVA_OPTS com.rong360.main.Rong360CDC $file $master>/dev/null 2>&1 &
+			nohup $javaBin -Xms512m -Xmx512m -Xmn256m -Djava.ext.dirs=lib -Djava.awt.headless=true $JAVA_OPTS com.rong360.main.Rong360CDC $file $master>/dev/null 2>&1 &
 			#check start status
 			sleep 5
-			pid=`ps aux | grep com.rong360.main.Rong360CDC |grep "$file$fileext" |grep "$master"| grep -v grep | awk  '{print $2}'`
+			pid=`ps aux | grep com.rong360.main.Rong360CDC |grep "$file$fileext" |grep "$master$"| grep -v grep | awk  '{print $2}'`
 			if [ -z $pid ];then
 				echo "start fail!"$master" cluster's instance:"$file
-				echo "please check java env or etcd config:"$javaPath
+				echo "please check java env or etcd config:"$javaBin
 			else
 				echo "start success!"$master" cluster's instance:"$file" [pid:"$pid"]"
 			fi
