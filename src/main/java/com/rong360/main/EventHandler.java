@@ -193,6 +193,7 @@ public class EventHandler extends Thread {
                         threadBinlogMap.put(this.threadName, binlogInfo);
                     } else {
                         log.warn("[thread:{}]send message fail: position:{},file:{}", this.threadName, binlogPosition, binlogFilename);
+                        Thread.sleep(100);
                     }
                 }
             } catch (Exception e) {
