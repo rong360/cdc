@@ -20,7 +20,7 @@
 				<TimeBasedTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="1000 MB" />
 			</Policies>
-			<DefaultRolloverStrategy max="100"/>
+			<DefaultRolloverStrategy max="10"/>
 		</RollingFile>
 
 		<RollingFile name="RollingFileError"
@@ -32,7 +32,7 @@
 				<TimeBasedTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="1000 MB" />
 			</Policies>
-			<DefaultRolloverStrategy max="100"/>
+			<DefaultRolloverStrategy max="7"/>
 		</RollingFile>
 
 		<RollingFile name="RollingQueueFileInfo"
@@ -44,7 +44,7 @@
 				<TimeBasedTriggeringPolicy />
 				<SizeBasedTriggeringPolicy size="1000 MB" />
 			</Policies>
-			<DefaultRolloverStrategy max="100"/>
+			<DefaultRolloverStrategy max="10"/>
 		</RollingFile>
 	</Appenders>
 	<Loggers>
