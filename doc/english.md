@@ -170,9 +170,9 @@ Uniform prefix cdc/cluster/instance, below is a complete list of configurations
 
 ##### Filtering rule
 The table filtering key basic rule is:
-- Sequentially: cdc/cluster/instance/config/cdc/filter/database name/table
+- Non-sequential: cdc/cluster/instance/config/cdc/filter/database name/table
 name
-- Non-sequential sending: cdc/cluster/instance/config/cdc/seqfilter/database name/table name
+- Sequentially: cdc/cluster/instance/config/cdc/seqfilter/database name/table name
 
 > Note: Table filtering configuration requires at least one, if this feature is enabled.
 ##### Sharding
